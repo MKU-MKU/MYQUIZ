@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civil Engineering PSC Pro</title>
+    <style>
+        :root {
+            --primary: #1e293b; --accent: #3b82f6; --success: #10b981;
+            --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff;
+        }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; color: var(--primary); }
+        .navbar { background: var(--primary); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+        
+        /* Dashboard Card */
+        .hero-card { background: var(--card); padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 6px solid var(--accent); }
+        .section-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 1rem; font-weight: 700; }
+        
+        .grid-split { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem; }
+        @media (max-width: 600px) { .grid-split { grid-template-columns: 1fr; } }
+
+        .box { background: #f8fafc; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; }
+        select, input[type="file"] { width: 100%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #cbd5e1; }
+        
+        button { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 5px; }
+        button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        button:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .btn-success { background: var(--success); }
+
+        /* Quiz UI */
+        .timer-bar { position: sticky; top: 0; background: var(--card); padding: 1rem; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; justify-content: space-between; border-radius: 0.5rem; margin-bottom: 1.5rem; font-weight: bold; }
+        .question-card { background: var(--card); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .options-group label { display: block; padding: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; }
+        .options-group label:hover { background: #f0f7ff; border-color: var(--accent); }
+        
+        .explanation { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; color: #166534; }
+        .hidden { display: none; }
+        .correct-text { color: var(--success); font-weight: bold; }
+        .incorrect-text { color: var(--danger); font-weight: bold; }
+        #loading { text-align: center; color: var(--accent); font-weight: bold; padding: 20px; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div style="font-size: 1.2rem; font-weight: 800;">ENGINEERING QUIZ HUB</div>
+</nav>
+
+<div class="container">
+    <div id="home-view">
+        <div class="hero-card">
+            <h1 style="margin-top:0">Study Dashboard</h1>
+            <p style="color: #64748b">Choose your method to start practicing.</p>
+
+            <div class="grid-split">
+                <div class="box">
+                    <div class="section-title">☁️ Online (Google Drive)</div>
+                    <label>Chapter</label>
+                    <select id="chapter-select" onchange="updateTopics()">
+                        <option value="">-- Choose --</option>
+                        <option value="1">1. Structural Engineering</option>
+                        <option value="2">2. Engineering Survey</option>
+                    </select>
+                    <label>Topic</label>
+                    <select id="topic-select" disabled>
+                        <option value="">-- Choose Topic --</option>
+                    </select>
+                    <button onclick="fetchAndStart()">Fetch from Drive</button>
+                </div>
+
+                <div class="box">
+                    <div class="section-title">📂 Local (Offline File)</div>
+                    <p style="font-size: 0.8rem; color: #64748b">Use this for 100-question batches I give you.</p>
+                    <input type="file" id="local-file-input" accept=".json">
+                    <button class="btn-success" onclick="loadLocalFile()">Start Local Quiz</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading" class="hidden">🔄 Accessing Google Drive... Please wait...</div>
+
+    <div id="quiz-view" class="hidden">
+        <div class="timer-bar">
+            <span>Engineering Practice</span>
+            <span style="color:var(--danger)">⏳ <span id="timer-display">00:00</span></span>
+        </div>
+        <div id="questions-container"></div>
+        <button onclick="calculateResults()" style="background:var(--success); padding:1.5rem; font-size:1.1rem; margin-top:2rem">Submit All Answers</button>
+    </div>
+
+    <div id="result-view" class="hidden">
+        <div class="hero-card" style="text-align:center">
+            <h2 id="final-score" style="font-size: 2.5rem; margin:0"></h2>
+            <button onclick="location.reload()" style="width:auto; margin-top:1rem; background:#64748b">Try Another Topic</button>
+        </div>
+        <div id="review-container" style="margin-top:2rem"></div>
+    </div>
+</div>
+
+<script>
+    // --- CONFIG ---
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXPr0NmIbpixNSa6c0RcwWhPqqxZiIHOkZnLhEa36KFguMhNp3iOE4iaLs7G3GZyZIUg/exec";
+    const DRIVE_FILES = {
+        "1": { 
+            "1.1 Strength of Materials": "178ah5E9cjk12C6cCFBm-bLd9zzoMDhbc",
+            "1.2 Stresses & Strains": "1QgUgbbN4WdBx16HAibbtFBYoZ5u59LgG"
+        },
+        "2": { 
+            "2.2 Linear Measurement": "FILE_ID_1",
+            "2.5 Leveling": "FILE_ID_2"
+        }
+    };
+
+    let questions = [];
+    let timer;
+
+    // --- LOGIC ---
+    function updateTopics() {
+        const chap = document.getElementById('chapter-select').value;
+        const topicSel = document.getElementById('topic-select');
+        topicSel.innerHTML = '<option value="">-- Choose Topic --</option>';
+        if (DRIVE_FILES[chap]) {
+            topicSel.disabled = false;
+            for (let t in DRIVE_FILES[chap]) topicSel.add(new Option(t, DRIVE_FILES[chap][t]));
+        } else { topicSel.disabled = true; }
+    }
+
+    async function fetchAndStart() {
+        const fileId = document.getElementById('topic-select').value;
+        if (!fileId) return alert("Select a topic!");
+        document.getElementById('home-view').classList.add('hidden');
+        document.getElementById('loading').classList.remove('hidden');
+        try {
+            const res = await fetch(`${APPS_SCRIPT_URL}?id=${fileId}`);
+            questions = await res.json();
+            startQuiz();
+        } catch (e) {
+            alert("Drive Error! Check your Script link and Permissions.");
+            location.reload();
+        }
+    }
+
+    function loadLocalFile() {
+        const file = document.getElementById('local-file-input').files[0];
+        if (!file) return alert("Select a file!");
+        const reader = new FileReader();
+        reader.onload = (e) => { 
+            questions = JSON.parse(e.target.result); 
+            document.getElementById('home-view').classList.add('hidden');
+            startQuiz(); 
+        };
+        reader.readAsText(file);
+    }
+
+    function startQuiz() {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('quiz-view').classList.remove('hidden');
+        const container = document.getElementById('questions-container');
+        container.innerHTML = "";
+        questions.forEach((q, i) => {
+            let opts = q.options.map((o, idx) => `
+                <label><input type="radio" name="q${i}" value="${idx}"> ${o}</label>
+            `).join('');
+            container.innerHTML += `
+                <div class="question-card">
+                    <p><strong>${i+1}. ${q.q}</strong></p>
+                    <div class="options-group">${opts}</div>
+                </div>`;
+        });
+        let sec = questions.length * 60;
+        timer = setInterval(() => {
+            sec--;
+            document.getElementById('timer-display').innerText = `${Math.floor(sec/60)}:${(sec%60).toString().padStart(2,'0')}`;
+            if(sec<=0) calculateResults();
+        }, 1000);
+    }
+
+    function calculateResults() {
+        clearInterval(timer);
+        document.getElementById('quiz-view').classList.add('hidden');
+        document.getElementById('result-view').classList.remove('hidden');
+        let score = 0;
+        const review = document.getElementById('review-container');
+        questions.forEach((q, i) => {
+            const sel = document.querySelector(`input[name="q${i}"]:checked`);
+            const val = sel ? sel.value : -1;
+            const correct = val == q.correct;
+            if(correct) score++;
+            review.innerHTML += `
+                <div class="question-card">
+                    <p><strong>${i+1}. ${q.q}</strong></p>
+                    <p>Ans: <span class="${correct?'correct-text':'incorrect-text'}">${val!=-1?q.options[val]:'SKIPPED'}</span></p>
+                    <p class="correct-text">Correct: ${q.options[q.correct]}</p>
+                    <div class="explanation"><strong>💡 Explain:</strong> ${q.explain}</div>
+                </div>`;
+        });
+        document.getElementById('final-score').innerText = `Score: ${score} / ${questions.length}`;
+    }
+</script>
+</body>
+</html>
