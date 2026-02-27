@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Civil Engineering PSC Pro</title>
+    <title>MOHITS QUIZ</title>
     <style>
         :root {
             --primary: #1e293b; --accent: #3b82f6; --success: #10b981;
@@ -60,7 +60,16 @@
                     <select id="chapter-select" onchange="updateTopics()">
                         <option value="">-- Choose --</option>
                         <option value="1">1. Structural Engineering</option>
-                        <option value="2">2. Engineering Survey</option>
+			<option value="2">2. Engineering Survey</option>
+			<option value="3">3. Construction Materials</option>
+			<option value="4">4. Concrete Technology</option>
+			<option value="5">5. Geotechnical Engineering</option>
+			<option value="6">6. Construction Management</option>
+			<option value="7">7. Estimating, Costing, Specification and Valuation</option>
+			<option value="8">8. Engineering Drawing</option>
+			<option value="9">9. Engineering Economics</option>
+			<option value="10">10. Professional Practices</option>
+			<option value="11">11. General Knowledge</option>
                     </select>
                     <label>Topic</label>
                     <select id="topic-select" disabled>
@@ -103,14 +112,84 @@
     // --- CONFIG ---
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXPr0NmIbpixNSa6c0RcwWhPqqxZiIHOkZnLhEa36KFguMhNp3iOE4iaLs7G3GZyZIUg/exec";
     const DRIVE_FILES = {
-        "1": { 
-            "1.1 Strength of Materials": "178ah5E9cjk12C6cCFBm-bLd9zzoMDhbc",
-            "1.2 Stresses & Strains": "1QgUgbbN4WdBx16HAibbtFBYoZ5u59LgG"
-        },
-        "2": { 
-            "2.2 Linear Measurement": "FILE_ID_1",
-            "2.5 Leveling": "FILE_ID_2"
-        }
+    "1": {
+        "DPARSAD 1-100": "178ah5E9cjk12C6cCFBm-bLd9zzoMDhbc",
+        "DPARSAD 101-200": "",
+        "DPARSAD 201-300": "",
+        "DPARSAD 301-400": "",
+        "DPARSAD 401-500": ""
+    },
+    "2": {
+        "DPARSAD 1-100": "",
+        "DPARSAD 101-200": "",
+        "DPARSAD 201-300": "",
+        "DPARSAD 301-400": "",
+        "DPARSAD 401-500": ""
+    },
+    "3": {
+        "DPARSAD 1-100": "",
+        "DPARSAD 101-200": "",
+        "DPARSAD 201-300": "",
+        "DPARSAD 301-400": "",
+        "DPARSAD 401-500": ""
+    },
+    "4": {
+        "DPARSAD 1-100": "",
+        "DPARSAD 101-200": "",
+        "DPARSAD 201-300": "",
+        "DPARSAD 301-400": "",
+        "DPARSAD 401-500": ""
+    },
+    "5": {
+        "DPARSAD 1-100": "",
+        "DPARSAD 101-200": "",
+        "DPARSAD 201-300": "",
+        "DPARSAD 301-400": "",
+        "DPARSAD 401-500": ""
+    },
+    "6": {
+        "DPARSAD 1-100": "",
+        "DPARSAD 101-200": "",
+        "DPARSAD 201-300": "",
+        "DPARSAD 301-400": "",
+        "DPARSAD 401-500": ""
+    },
+    "7": {
+        "DPARSAD 1-100": "",
+        "DPARSAD 101-200": "",
+        "DPARSAD 201-300": "",
+        "DPARSAD 301-400": "",
+        "DPARSAD 401-500": ""
+    },
+    "8": {
+        "DPARSAD 1-100": "",
+        "DPARSAD 101-200": "",
+        "DPARSAD 201-300": "",
+        "DPARSAD 301-400": "",
+        "DPARSAD 401-500": ""
+    },
+    "9": {
+        "DPARSAD 1-100": "",
+        "DPARSAD 101-200": "",
+        "DPARSAD 201-300": "",
+        "DPARSAD 301-400": "",
+        "DPARSAD 401-500": ""
+    },
+    "10": {
+        "DPARSAD 1-100": "",
+        "DPARSAD 101-200": "",
+        "DPARSAD 201-300": "",
+        "DPARSAD 301-400": "",
+        "DPARSAD 401-500": ""
+    },
+    "11": {
+        "DPARSAD 1-100": "",
+        "DPARSAD 101-200": "",
+        "DPARSAD 201-300": "",
+        "DPARSAD 301-400": "",
+        "DPARSAD 401-500": ""
+    }
+   
     };
 
     let questions = [];
