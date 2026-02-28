@@ -262,26 +262,57 @@
         }, 1000);
     }
 
-    function calculateResults() {
+  function calculateResults() {
         clearInterval(timer);
         document.getElementById('quiz-view').classList.add('hidden');
-        document.getElementById('result-view').classList.remove('hidden');
+        const resultView = document.getElementById('result-view');
+        resultView.classList.remove('hidden');
+        
         let score = 0;
         const review = document.getElementById('review-container');
+        review.innerHTML = ""; // Clear previous results
+
         questions.forEach((q, i) => {
             const sel = document.querySelector(`input[name="q${i}"]:checked`);
-            const val = sel ? sel.value : -1;
-            const correct = val == q.correct;
-            if(correct) score++;
+            const selectedIdx = sel ? parseInt(sel.value) : -1;
+            const isCorrect = selectedIdx === q.correct;
+            
+            if(isCorrect) score++;
+
+            // Generate the list of all options with highlights
+            let optionsHtml = q.options.map((opt, idx) => {
+                let style = "";
+                let label = "";
+
+                if (idx === q.correct) {
+                    style = "background: #dcfce7; border-color: #22c55e; color: #166534; font-weight: bold;";
+                    label = " (Correct)";
+                } else if (idx === selectedIdx && !isCorrect) {
+                    style = "background: #fee2e2; border-color: #ef4444; color: #991b1b;";
+                    label = " (Your Answer)";
+                }
+
+                return `<div style="padding: 8px; margin: 4px 0; border: 1px solid #e2e8f0; border-radius: 4px; ${style}">
+                            ${opt}${label}
+                        </div>`;
+            }).join('');
+
             review.innerHTML += `
-                <div class="question-card">
+                <div class="question-card" style="border-left: 5px solid ${isCorrect ? 'var(--success)' : 'var(--danger)'}">
                     <p><strong>${i+1}. ${q.q}</strong></p>
-                    <p>Ans: <span class="${correct?'correct-text':'incorrect-text'}">${val!=-1?q.options[val]:'SKIPPED'}</span></p>
-                    <p class="correct-text">Correct: ${q.options[q.correct]}</p>
-                    <div class="explanation"><strong>💡 Explain:</strong> ${q.explain}</div>
+                    <div style="margin-bottom: 1rem;">
+                        ${optionsHtml}
+                    </div>
+                    ${selectedIdx === -1 ? '<p style="color:var(--danger)">⚠️ <em>You skipped this question.</em></p>' : ''}
+                    <div class="explanation">
+                        <strong>💡 Explanation:</strong> ${q.explain}
+                    </div>
                 </div>`;
         });
+
         document.getElementById('final-score').innerText = `Score: ${score} / ${questions.length}`;
+        // Scroll to top of results
+        window.scrollTo(0,0);
     }
 </script>
 </body>
