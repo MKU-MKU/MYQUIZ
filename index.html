@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOHITS QUIZ</title>
+    <title>MOHITS QUIZ · practice wrong answers (fixed)</title>
     <style>
         :root {
             --primary: #1e293b; --accent: #3b82f6; --success: #10b981;
@@ -13,7 +13,6 @@
         .navbar { background: var(--primary); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
         
-        /* Dashboard Card */
         .hero-card { background: var(--card); padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 6px solid var(--accent); }
         .section-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 1rem; font-weight: 700; }
         
@@ -28,7 +27,6 @@
         button:disabled { background: #cbd5e1; cursor: not-allowed; }
         .btn-success { background: var(--success); }
 
-        /* Quiz UI */
         .timer-bar { position: sticky; top: 0; background: var(--card); padding: 1rem; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; justify-content: space-between; border-radius: 0.5rem; margin-bottom: 1.5rem; font-weight: bold; }
         .question-card { background: var(--card); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .options-group label { display: block; padding: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; }
@@ -60,29 +58,29 @@
                     <select id="chapter-select" onchange="updateTopics()">
                         <option value="">-- Choose --</option>
                         <option value="1">1. Structural Engineering</option>
-			<option value="2">2. Engineering Survey</option>
-			<option value="3">3. Construction Materials</option>
-			<option value="4">4. Concrete Technology</option>
-			<option value="5">5. Geotechnical Engineering</option>
-			<option value="6">6. Construction Management</option>
-			<option value="7">7. Estimating, Costing, Specification and Valuation</option>
-			<option value="8">8. Engineering Drawing</option>
-			<option value="9">9. Engineering Economics</option>
-			<option value="10">10. Professional Practices</option>
-			<option value="11">11. General Knowledge</option>
+                        <option value="2">2. Engineering Survey</option>
+                        <option value="3">3. Construction Materials</option>
+                        <option value="4">4. Concrete Technology</option>
+                        <option value="5">5. Geotechnical Engineering</option>
+                        <option value="6">6. Construction Management</option>
+                        <option value="7">7. Estimating, Costing, Specification and Valuation</option>
+                        <option value="8">8. Engineering Drawing</option>
+                        <option value="9">9. Engineering Economics</option>
+                        <option value="10">10. Professional Practices</option>
+                        <option value="11">11. General Knowledge</option>
                     </select>
                     <label>Topic</label>
                     <select id="topic-select" disabled>
                         <option value="">-- Choose Topic --</option>
                     </select>
-                    <button onclick="fetchAndStart()">Fetch from Drive</button>
+                    <button type="button" onclick="fetchAndStart()">Fetch from Drive</button>
                 </div>
 
                 <div class="box">
                     <div class="section-title">📂 Local (Offline File)</div>
                     <p style="font-size: 0.8rem; color: #64748b">Use this for 100-question batches I give you.</p>
                     <input type="file" id="local-file-input" accept=".json">
-                    <button class="btn-success" onclick="loadLocalFile()">Start Local Quiz</button>
+                    <button type="button" class="btn-success" onclick="loadLocalFile()">Start Local Quiz</button>
                 </div>
             </div>
         </div>
@@ -96,13 +94,16 @@
             <span style="color:var(--danger)">⏳ <span id="timer-display">00:00</span></span>
         </div>
         <div id="questions-container"></div>
-        <button onclick="calculateResults()" style="background:var(--success); padding:1.5rem; font-size:1.1rem; margin-top:2rem">Submit All Answers</button>
+        <button type="button" onclick="calculateResults()" style="background:var(--success); padding:1.5rem; font-size:1.1rem; margin-top:2rem">Submit All Answers</button>
     </div>
 
     <div id="result-view" class="hidden">
         <div class="hero-card" style="text-align:center">
             <h2 id="final-score" style="font-size: 2.5rem; margin:0"></h2>
-            <button onclick="location.reload()" style="width:auto; margin-top:1rem; background:#64748b">Try Another Topic</button>
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap;">
+                <button type="button" onclick="practiceWrong()" style="width:auto; background:var(--accent)">📋 Practice Wrong Answers</button>
+                <button type="button" onclick="location.reload()" style="width:auto; background:#64748b">🏠 Try Another Topic</button>
+            </div>
         </div>
         <div id="review-container" style="margin-top:2rem"></div>
     </div>
@@ -183,26 +184,48 @@
     "10. Fundamentals of Management": "",
     "11. Govt. Planning, Budgeting & Accounting": "1ZIbu4pcNLDw-N_kGEUtdNVtJqxNX0c_T"
     }
-   
     };
 
     let questions = [];
     let timer;
+    let quizActive = false;          // prevent double submission
+    let wrongQuestions = [];
 
-    // --- LOGIC ---
+    // --- HELPER: robust answer comparison (handles numbers or letters) ---
+    function isAnswerCorrect(selected, correct) {
+        if (selected === undefined || selected === null || correct === undefined || correct === null) return false;
+        // Convert both to strings and trim
+        let s = String(selected).trim();
+        let c = String(correct).trim();
+        // If they are numeric strings, compare as numbers too (optional)
+        if (!isNaN(s) && !isNaN(c)) {
+            return Number(s) === Number(c);
+        }
+        // Otherwise case-insensitive string compare
+        return s.toLowerCase() === c.toLowerCase();
+    }
+
+    // --- update topic dropdown, disabling empty file IDs ---
     function updateTopics() {
         const chap = document.getElementById('chapter-select').value;
         const topicSel = document.getElementById('topic-select');
         topicSel.innerHTML = '<option value="">-- Choose Topic --</option>';
         if (DRIVE_FILES[chap]) {
             topicSel.disabled = false;
-            for (let t in DRIVE_FILES[chap]) topicSel.add(new Option(t, DRIVE_FILES[chap][t]));
-        } else { topicSel.disabled = true; }
+            for (let t in DRIVE_FILES[chap]) {
+                let fileId = DRIVE_FILES[chap][t];
+                let option = new Option(t, fileId);
+                if (!fileId) option.disabled = true;   // disable empty entries
+                topicSel.add(option);
+            }
+        } else {
+            topicSel.disabled = true;
+        }
     }
 
     async function fetchAndStart() {
         const fileId = document.getElementById('topic-select').value;
-        if (!fileId) return alert("Select a topic!");
+        if (!fileId) return alert("Please select a topic (topics without a file ID are disabled).");
         document.getElementById('home-view').classList.add('hidden');
         document.getElementById('loading').classList.remove('hidden');
         try {
@@ -210,7 +233,7 @@
             questions = await res.json();
             startQuiz();
         } catch (e) {
-            alert("Drive Error! Check your Script link and Permissions.");
+            alert("Drive Error! Check your Script link and Permissions.\n" + e.message);
             location.reload();
         }
     }
@@ -219,17 +242,26 @@
         const file = document.getElementById('local-file-input').files[0];
         if (!file) return alert("Select a file!");
         const reader = new FileReader();
-        reader.onload = (e) => { 
-            questions = JSON.parse(e.target.result); 
-            document.getElementById('home-view').classList.add('hidden');
-            startQuiz(); 
+        reader.onload = (e) => {
+            try {
+                questions = JSON.parse(e.target.result);
+                document.getElementById('home-view').classList.add('hidden');
+                startQuiz();
+            } catch (err) {
+                alert("Invalid JSON file. Please check the file format.");
+            }
         };
         reader.readAsText(file);
     }
 
     function startQuiz() {
+        if (timer) clearInterval(timer);
+        quizActive = true;                     // mark quiz as active
+
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('quiz-view').classList.remove('hidden');
+        document.getElementById('result-view').classList.add('hidden');
+
         const container = document.getElementById('questions-container');
         container.innerHTML = "";
         questions.forEach((q, i) => {
@@ -242,72 +274,104 @@
                     <div class="options-group">${opts}</div>
                 </div>`;
         });
+
         let sec = questions.length * 60;
+        document.getElementById('timer-display').innerText = `${Math.floor(sec/60)}:${(sec%60).toString().padStart(2,'0')}`;
         timer = setInterval(() => {
+            if (!quizActive) return;            // don't proceed if quiz already ended
             sec--;
             document.getElementById('timer-display').innerText = `${Math.floor(sec/60)}:${(sec%60).toString().padStart(2,'0')}`;
-            if(sec<=0) calculateResults();
+            if (sec <= 0) calculateResults();
         }, 1000);
     }
 
-  function calculateResults() {
-    clearInterval(timer);
-    document.getElementById('quiz-view').classList.add('hidden');
-    const resultView = document.getElementById('result-view');
-    resultView.classList.remove('hidden');
-    
-    let score = 0;
-    const review = document.getElementById('review-container');
-    review.innerHTML = ""; 
+    function calculateResults() {
+        if (!quizActive) return;                // already submitted or timer already fired
+        quizActive = false;                      // prevent double run
+        clearInterval(timer);
 
-    questions.forEach((q, i) => {
-        const sel = document.querySelector(`input[name="q${i}"]:checked`);
-        const selectedIdx = sel ? parseInt(sel.value) : -1;
-        
-        // --- KEY NORMALIZATION ---
-        // This checks multiple possible names for the same data
-        const correctAnswer = (q.correct !== undefined) ? q.correct : q.answer;
-        const questionText = q.q || q.question || "Question text missing";
-        const explanationText = q.explain || q.explanation || "No explanation provided.";
-        // -------------------------
+        document.getElementById('quiz-view').classList.add('hidden');
+        const resultView = document.getElementById('result-view');
+        resultView.classList.remove('hidden');
 
-        const isCorrect = selectedIdx === parseInt(correctAnswer);
-        if(isCorrect) score++;
+        let score = 0;
+        const review = document.getElementById('review-container');
+        review.innerHTML = "";
 
-        let optionsHtml = q.options.map((opt, idx) => {
-            let style = "padding: 10px; margin: 5px 0; border: 1px solid #e2e8f0; border-radius: 6px; transition: 0.3s;";
-            let label = "";
+        // reset wrong questions array
+        wrongQuestions = [];
 
-            if (idx === parseInt(correctAnswer)) {
-                // Always highlight the correct answer in Green
-                style = "padding: 10px; margin: 5px 0; border: 2px solid #22c55e; border-radius: 6px; background: #dcfce7; color: #166534; font-weight: bold;";
-                label = " <span style='float:right'>✔ Correct Answer</span>";
-            } else if (idx === selectedIdx && !isCorrect) {
-                // If the user picked this and it's wrong, highlight in Red
-                style = "padding: 10px; margin: 5px 0; border: 2px solid #ef4444; border-radius: 6px; background: #fee2e2; color: #991b1b;";
-                label = " <span style='float:right'>✖ Your Choice</span>";
+        questions.forEach((q, i) => {
+            const sel = document.querySelector(`input[name="q${i}"]:checked`);
+            const selectedIdx = sel !== null ? parseInt(sel.value) : -1;
+
+            // Normalize fields
+            const correctAnswer = (q.correct !== undefined) ? q.correct : q.answer;
+            const questionText = q.q || q.question || "Question text missing";
+            const explanationText = q.explain || q.explanation || "No explanation provided.";
+
+            // Use robust comparison
+            const isCorrect = isAnswerCorrect(selectedIdx, correctAnswer);
+            if (isCorrect) score++;
+            else {
+                wrongQuestions.push(q);          // store for practice
             }
 
-            return `<div style="${style}">${opt}${label}</div>`;
-        }).join('');
+            let optionsHtml = q.options.map((opt, idx) => {
+                let style = "padding: 10px; margin: 5px 0; border: 1px solid #e2e8f0; border-radius: 6px; transition: 0.3s;";
+                let label = "";
 
-        review.innerHTML += `
-            <div class="question-card" style="border-left: 10px solid ${isCorrect ? '#10b981' : '#ef4444'}">
-                <p style="font-size: 1.1rem; margin-bottom: 1rem;"><strong>${i+1}. ${questionText}</strong></p>
-                <div>${optionsHtml}</div>
-                ${selectedIdx === -1 ? '<p style="color:#ef4444; font-weight:bold; margin-top:10px;">⚠️ You skipped this question.</p>' : ''}
-                <div class="explanation" style="margin-top:15px; background: #f8fafc; border: 1px solid #cbd5e1; color: #334155;">
-                    <strong style="color:var(--accent)">💡 Explanation:</strong> ${explanationText}
-                </div>
-            </div>`;
-    });
+                if (isAnswerCorrect(idx, correctAnswer)) {
+                    style = "padding: 10px; margin: 5px 0; border: 2px solid #22c55e; border-radius: 6px; background: #dcfce7; color: #166534; font-weight: bold;";
+                    label = " <span style='float:right'>✔ Correct Answer</span>";
+                } else if (idx === selectedIdx && !isCorrect) {
+                    style = "padding: 10px; margin: 5px 0; border: 2px solid #ef4444; border-radius: 6px; background: #fee2e2; color: #991b1b;";
+                    label = " <span style='float:right'>✖ Your Choice</span>";
+                }
 
-    document.getElementById('final-score').innerHTML = `
-        <div style="font-size: 1rem; color: #64748b; text-transform: uppercase;">Final Result</div>
-        <div style="font-size: 3.5rem; font-weight: 800; color: var(--primary)">${score} <span style="font-size: 1.5rem; color: #94a3b8">/ ${questions.length}</span></div>
-    `;
-    window.scrollTo(0,0);
-}
+                return `<div style="${style}">${opt}${label}</div>`;
+            }).join('');
+
+            review.innerHTML += `
+                <div class="question-card" style="border-left: 10px solid ${isCorrect ? '#10b981' : '#ef4444'}">
+                    <p style="font-size: 1.1rem; margin-bottom: 1rem;"><strong>${i+1}. ${questionText}</strong></p>
+                    <div>${optionsHtml}</div>
+                    ${selectedIdx === -1 ? '<p style="color:#ef4444; font-weight:bold; margin-top:10px;">⚠️ You skipped this question.</p>' : ''}
+                    <div class="explanation" style="margin-top:15px; background: #f8fafc; border: 1px solid #cbd5e1; color: #334155;">
+                        <strong style="color:var(--accent)">💡 Explanation:</strong> ${explanationText}
+                    </div>
+                </div>`;
+        });
+
+        document.getElementById('final-score').innerHTML = `
+            <div style="font-size: 1rem; color: #64748b; text-transform: uppercase;">Final Result</div>
+            <div style="font-size: 3.5rem; font-weight: 800; color: var(--primary)">${score} <span style="font-size: 1.5rem; color: #94a3b8">/ ${questions.length}</span></div>
+        `;
+        window.scrollTo(0, 0);
+    }
+
+    function practiceWrong() {
+        if (!wrongQuestions || wrongQuestions.length === 0) {
+            alert("No wrong answers to practice! You got them all right 🎉");
+            return;
+        }
+
+        if (timer) clearInterval(timer);
+        quizActive = false;   // make sure any old timer doesn't interfere
+
+        // set questions to the wrong set (shallow copy)
+        questions = wrongQuestions.slice();
+
+        document.getElementById('result-view').classList.add('hidden');
+        document.getElementById('quiz-view').classList.remove('hidden');
+
+        startQuiz();   // start fresh with the wrong set
+    }
+
+    // Initialize: disable empty options on page load (topics will be populated later, but we can call updateTopics initially)
+    window.onload = function() {
+        updateTopics();  // ensures chapter 1 is selected? no, default empty chapter, but it's fine.
+    };
 </script>
 </body>
 </html>
