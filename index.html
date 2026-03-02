@@ -226,6 +226,30 @@
             .btn { padding: 0.6rem 1rem; }
             .btn-small { padding: 0.2rem 0.5rem; font-size: 0.75rem; }
         }
+
+                /* ===== FIXED NAVIGATION BUTTONS FOR PRACTICE MODE ===== */
+#flashcard-ui {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 180px);
+}
+
+#flashcard-ui .question-card {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    margin-bottom: 0.5rem;
+}
+
+#flashcard-ui > div:last-child {
+    flex-shrink: 0;
+    background: var(--bg);
+    padding: 0.8rem 0;
+    border-top: 1px solid var(--border);
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+}
+        
     </style>
 </head>
 <body>
