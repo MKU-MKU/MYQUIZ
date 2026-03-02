@@ -224,7 +224,7 @@
         .hidden { display: none !important; }
         footer { text-align: center; margin-top: 3rem; color: #64748b; font-size: 1rem; }
 
-        /* ===== MOBILE COMPACT LAYOUT ===== */
+        /* ===== MOBILE COMPACT LAYOUT (including sticky buttons) ===== */
         @media (max-width: 600px) {
             .navbar {
                 padding: 0.5rem 1rem;
@@ -283,12 +283,35 @@
                 padding: 0.2rem 0.5rem;
                 font-size: 0.75rem;
             }
+            
+            /* ===== STICKY BUTTONS FIX FOR PRACTICE MODE ===== */
+            #flashcard-ui {
+                display: flex;
+                flex-direction: column;
+                height: calc(100vh - 180px); /* Adjust based on header height */
+            }
+            #flashcard-ui .question-card {
+                flex: 1 1 auto;
+                overflow-y: auto;
+                margin-bottom: 0.5rem;
+            }
+            #flashcard-ui > div:last-child {
+                flex-shrink: 0;
+                background: var(--bg);
+                padding: 0.5rem 0;
+                border-top: 1px solid var(--border);
+                position: sticky;
+                bottom: 0;
+                z-index: 10;
+            }
+            /* Reduce extra gap */
             #flashcard-ui > div[style*="margin: 2rem 0"] {
-                margin: 0.5rem 0 0.2rem 0 !important;
+                margin: 0 !important;
             }
             footer {
-                margin-top: 0.2rem !important;
+                margin-top: 0.5rem !important;
             }
+            /* Keep question card readable */
             .question-card {
                 padding: 1.5rem;
             }
@@ -317,7 +340,7 @@
 </head>
 <body>
 <nav class="navbar">
-    <h2>🧠 HAMRO AFNAI QUIZ</h2>
+    <h2>🧠 HAMRO AFNAI SATHI</h2>
     <div>
         <button onclick="toggleTheme()" style="background:transparent; border:2px solid white; padding:0.4rem 0.8rem;">🌓</button>
         <button id="install-btn" onclick="installPWA()">📲 Install App</button>
@@ -328,7 +351,7 @@
     <!-- HOME VIEW (unchanged) -->
     <div id="home-view">
         <div class="hero-card">
-            <h1>Hamro Afnai HomePage</h1>
+            <h1>SATHI Dashboard</h1>
             <div class="subhead">Choose your mode – practice (one by one) or exam (all at once).</div>
 
             <!-- Online section -->
@@ -475,13 +498,13 @@
         const iconUrl = 'https://i.imgur.com/lCc9SUi.png';
 
         const manifest = {
-            name: 'HAMRO AFNAI SATHI',
+            name: 'HAMRO AFNAI',
             short_name: 'SATHI',          // displayed under the icon
             description: 'Your quiz app with custom branding',
             start_url: '.',
             display: 'standalone',
             theme_color: '#1e293b',
-            background_color: '#1e293b',
+            background_color: '#ffffff',
             icons: [
                 {
                     src: iconUrl,
