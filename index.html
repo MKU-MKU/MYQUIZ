@@ -215,9 +215,26 @@
         }
         .hidden { display: none !important; }
         footer { text-align: center; margin-top: 2rem; color: #64748b; font-size: 0.8rem; }
+        /* ===== MOBILE COMPACT LAYOUT ===== */
+@media (max-width: 600px) {
+    /* Smaller navbar */
+    .navbar {
+        padding: 0.5rem 1rem;
+    }
+    .navbar h2 {
+        font-size: 1rem;
+    }
+    .navbar button {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    #install-btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.7rem;
+        margin-left: 0.3rem;
+    }
 
-        @media (max-width: 600px) {
-    .navbar h2 { font-size: 1.2rem; }
+    /* Container and cards */
     .container { padding: 0 0.8rem; margin: 1rem auto; }
     .hero-card { padding: 1.2rem; }
     h1 { font-size: 1.5rem; }
@@ -228,7 +245,7 @@
         flex-wrap: wrap;
         padding: 0.5rem;
         gap: 0.3rem;
-        top: 70px; /* adjust for smaller navbar */
+        top: 70px;
     }
     .mode-badge {
         font-size: 0.8rem;
@@ -236,7 +253,7 @@
     }
     .timer {
         font-size: 1rem;
-        margin-left: auto; /* push timer to right if space */
+        margin-left: auto;
     }
     .nav-buttons {
         display: flex;
@@ -248,27 +265,33 @@
     .nav-buttons .btn {
         padding: 0.4rem 0.8rem;
         font-size: 0.8rem;
-        white-space: nowrap; /* prevent button text wrapping */
+        white-space: nowrap;
     }
 
-    /* Existing button styles */
+    /* General button size */
     .btn { padding: 0.6rem 1rem; }
     .btn-small { padding: 0.2rem 0.5rem; font-size: 0.75rem; }
 }
 
-                /* ===== FIXED NAVIGATION BUTTONS FOR PRACTICE MODE ===== */
+/* ===== FOOTER GAP REDUCTION ===== */
+#flashcard-ui > div[style*="margin: 2rem 0"] {
+    margin: 1rem 0 0.5rem 0 !important; /* less space above and below */
+}
+footer {
+    margin-top: 0.5rem !important; /* bring footer closer */
+}
+
+/* ===== OPTIONAL: FIXED NAVIGATION BUTTONS (if you want them always visible) ===== */
 #flashcard-ui {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 180px);
+    height: calc(100vh - 180px); /* adjust 180px if needed */
 }
-
 #flashcard-ui .question-card {
     flex: 1 1 auto;
     overflow-y: auto;
     margin-bottom: 0.5rem;
 }
-
 #flashcard-ui > div:last-child {
     flex-shrink: 0;
     background: var(--bg);
