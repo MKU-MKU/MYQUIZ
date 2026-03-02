@@ -16,6 +16,47 @@
             --danger: #f87171; --warning: #fbbf24; --bg: #0f172a; --card: #1e293b;
             --text: #f1f5f9; --border: #334155;
         }
+        /* Dark mode specific overrides for correct/incorrect backgrounds */
+        .dark-mode .option-correct {
+            background: #1e3a2e !important;
+            border-color: #34d399 !important;
+            color: #e2ffe2 !important;
+        }
+        .dark-mode .option-incorrect {
+            background: #4a1e1e !important;
+            border-color: #f87171 !important;
+            color: #ffe2e2 !important;
+            text-decoration: line-through;
+        }
+        .dark-mode .explanation-box,
+        .dark-mode .explanation-box * {
+            color: #d4f7d4 !important;
+            background-color: #2a3a2a !important;
+            border-color: #2e4a2e !important;
+        }
+        /* Fix result review cards (they use inline styles) */
+        .dark-mode div[style*="background:#dcfce7"] {
+            background: #1e3a2e !important;
+            color: #e2ffe2 !important;
+            border-color: #34d399 !important;
+        }
+        .dark-mode div[style*="background:#fee2e2"] {
+            background: #4a1e1e !important;
+            color: #ffe2e2 !important;
+            border-color: #f87171 !important;
+        }
+        .dark-mode div[style*="border-left:12px solid #10b981"] {
+            border-left-color: #34d399 !important;
+        }
+        .dark-mode div[style*="border-left:12px solid #ef4444"] {
+            border-left-color: #f87171 !important;
+        }
+        /* Ensure question text and options remain readable */
+        .dark-mode .question-card p,
+        .dark-mode .options-group label {
+            color: var(--text) !important;
+        }
+
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: var(--bg); color: var(--text); transition: 0.2s;
@@ -102,7 +143,13 @@
         .btn-warning { background: var(--warning); }
         .btn-psycho { background: #8b5cf6; }
         .btn-block { width: 100%; }
-        .btn-small { padding: 0.5rem 1rem; font-size: 0.9rem; margin-left: 1rem; }
+        .btn-small {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+            background: var(--primary);
+        }
+        .btn-small:hover { filter: brightness(1.1); }
 
         /* Quiz header */
         .quiz-header {
@@ -140,7 +187,6 @@
             background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534;
             font-size: 1.1rem;
         }
-        .dark-mode .explanation-box { background: #1e2a1e; color: #bbf7d0; border-color: #2e4a2e; }
 
         .progress { height: 12px; background: var(--border); border-radius: 999px; margin: 2rem 0; }
         .progress-fill { height: 100%; background: var(--accent); border-radius: 999px; width: 0%; transition: width 0.3s; }
@@ -250,6 +296,10 @@
                     </div>
                     <button class="btn btn-psycho btn-block" onclick="startPsychoFlashcard()" id="psychoBtn" style="margin-top:2rem;">
                         ⚡ Start Psycho Flashcard
+                    </button>
+                    <!-- Psycho Exam button -->
+                    <button class="btn btn-warning btn-block" onclick="startPsychoExam()" style="margin-top:1rem;" id="psychoExamBtn">
+                        📝 Psycho Exam (100 random)
                     </button>
                     <div id="psychoProgress" class="loading-more"></div>
                 </div>
@@ -405,7 +455,6 @@
 
         function normalizeQuestions(qs, fileId) {
             return qs.map((q, idx) => {
-                // Create a new object to avoid mutating original
                 return {
                     id: q.id || idx,
                     options: q.options || [],
@@ -473,56 +522,44 @@
         }
 
         function loadLocalFile(selectedMode) {
-    const fileInput = document.getElementById('local-file-input');
-    const file = fileInput.files[0];
-    if (!file) {
-        alert('Please select a JSON file first.');
-        return;
-    }
-
-    // Show a loading indicator (optional)
-    document.getElementById('loading').classList.remove('hidden');
-    
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const rawData = JSON.parse(e.target.result);
-            
-            // Check if it's an array
-            if (!Array.isArray(rawData)) {
-                throw new Error('JSON must be an array of questions.');
+            const fileInput = document.getElementById('local-file-input');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a JSON file first.');
+                return;
             }
 
-            // Normalize each question using your existing function
-            questions = normalizeQuestions(rawData, 'local');
+            document.getElementById('loading').classList.remove('hidden');
             
-            // Verify that questions were parsed correctly
-            if (questions.length === 0) {
-                throw new Error('No questions found in the file.');
-            }
-
-            // Optional: check first question to ensure required fields exist
-            const first = questions[0];
-            if (!first.q || !first.options || first.correct === undefined) {
-                console.warn('First question missing required fields:', first);
-                // but continue anyway – the app might still work
-            }
-
-            currentChapterName = "Local File";
-            
-            // Hide home and loading, start the quiz
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('loading').classList.add('hidden');
-            startStandardQuiz(selectedMode);
-            
-        } catch (err) {
-            document.getElementById('loading').classList.add('hidden');
-            alert('Error loading file: ' + err.message);
-            console.error(err);
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const rawData = JSON.parse(e.target.result);
+                    if (!Array.isArray(rawData)) {
+                        throw new Error('JSON must be an array of questions.');
+                    }
+                    questions = normalizeQuestions(rawData, 'local');
+                    if (questions.length === 0) {
+                        throw new Error('No questions found in the file.');
+                    }
+                    const first = questions[0];
+                    if (!first.q || !first.options || first.correct === undefined) {
+                        console.warn('First question missing required fields:', first);
+                    }
+                    currentChapterName = "Local File";
+                    
+                    document.getElementById('home-view').classList.add('hidden');
+                    document.getElementById('loading').classList.add('hidden');
+                    startStandardQuiz(selectedMode);
+                    
+                } catch (err) {
+                    document.getElementById('loading').classList.add('hidden');
+                    alert('Error loading file: ' + err.message);
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
         }
-    };
-    reader.readAsText(file);
-}
 
         function startStandardQuiz(selectedMode) {
             document.getElementById('loading').classList.add('hidden');
@@ -531,13 +568,11 @@
             document.getElementById('practice-wrong-btn').classList.remove('hidden');
 
             if (selectedMode === 'exam') {
-                // Exam mode: all questions on one page
                 currentMode = 'standardExam';
                 document.getElementById('flashcard-ui').classList.add('hidden');
                 document.getElementById('standard-exam-ui').classList.remove('hidden');
                 document.getElementById('mode-display').innerText = 'EXAM (all at once)';
 
-                // Render all questions
                 const container = document.getElementById('questions-container');
                 container.innerHTML = '';
                 userAnswers = new Array(questions.length).fill(null);
@@ -552,57 +587,54 @@
                         </div>`;
                 });
             } else {
-                // Practice mode: series one by one
                 currentMode = 'standardPractice';
                 document.getElementById('flashcard-ui').classList.remove('hidden');
                 document.getElementById('standard-exam-ui').classList.add('hidden');
                 document.getElementById('mode-display').innerText = 'PRACTICE (series)';
 
-                // Initialize practice answers
                 practiceAnswers = new Array(questions.length).fill(null);
                 currentIndex = 0;
                 renderPracticeQuestion();
-                document.getElementById('nextBtn').disabled = true; // wait for answer
+                document.getElementById('nextBtn').disabled = true;
                 document.getElementById('prevBtn').disabled = currentIndex === 0;
-                document.getElementById('streaming-status').innerText = ''; // no background fetch
+                document.getElementById('streaming-status').innerText = '';
             }
 
-            // Start timer
             quizActive = true;
             startTime = Date.now();
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(updateTimer, 1000);
         }
 
-        // Exam: save answer
         window.saveExamAnswer = function(qIndex, optIndex) {
             if (!quizActive) return;
             userAnswers[qIndex] = optIndex;
         };
 
-        // Practice: render current question
         function renderPracticeQuestion() {
             let q = questions[currentIndex];
             let ans = practiceAnswers[currentIndex];
-            document.getElementById('question-text').innerText = `${currentIndex+1}. ${q.q}`;
+            // Add search button next to question text
+            let searchBtnHtml = `<button class="btn btn-small" onclick="searchCurrentQuestion()" style="margin-left: 1rem;">🔍 Search</button>`;
+            document.getElementById('question-text').innerHTML = `${currentIndex+1}. ${q.q} ${searchBtnHtml}`;
             let optsHtml = q.options.map((opt, idx) => {
                 let checked = (ans === idx) ? 'checked' : '';
                 return `<label id="opt-${idx}" class="option-label"><input type="radio" name="practice-opt" value="${idx}" ${checked} onchange="onPracticeAnswer(${idx})"> ${opt}</label>`;
             }).join('');
             document.getElementById('options-container').innerHTML = optsHtml;
 
-            // Remove any previous highlighting and hide explanation
             document.getElementById('explanation-box').classList.add('hidden');
             document.querySelectorAll('.option-label').forEach(el => {
                 el.classList.remove('option-correct', 'option-incorrect');
             });
 
-            // Update progress
             let answered = practiceAnswers.filter(a => a !== null).length;
             document.getElementById('progress-fill').style.width = (answered / questions.length * 100) + '%';
 
             document.getElementById('prevBtn').disabled = currentIndex === 0;
-            document.getElementById('nextBtn').disabled = true; // will be enabled after answer
+            const hasAnswer = practiceAnswers[currentIndex] !== null;
+            const isLast = currentIndex === questions.length - 1;
+            document.getElementById('nextBtn').disabled = isLast || !hasAnswer;
         }
 
         window.onPracticeAnswer = function(selectedIdx) {
@@ -610,7 +642,6 @@
             let q = questions[currentIndex];
             practiceAnswers[currentIndex] = selectedIdx;
 
-            // Highlight correct/incorrect
             let correctIdx = parseInt(q.correct);
             document.querySelectorAll('.option-label').forEach((label, idx) => {
                 label.classList.remove('option-correct', 'option-incorrect');
@@ -621,15 +652,12 @@
                 }
             });
 
-            // Show explanation
             let expDiv = document.getElementById('explanation-box');
             expDiv.classList.remove('hidden');
             expDiv.innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
 
-            // Enable next button (unless it's the last)
             document.getElementById('nextBtn').disabled = currentIndex === questions.length - 1;
 
-            // Update progress
             let answered = practiceAnswers.filter(a => a !== null).length;
             document.getElementById('progress-fill').style.width = (answered / questions.length * 100) + '%';
         };
@@ -649,11 +677,10 @@
                 currentIndex++;
                 renderPracticeQuestion();
             } else if (currentMode === 'psycho') {
-                // psycho's next is handled separately
+                nextFlashcard();
             }
         };
 
-        // Calculate exam results
         window.calculateExamResults = function() {
             if (!quizActive) return;
             quizActive = false;
@@ -692,7 +719,6 @@
             displayResults(correct, incorrect, skipped, questions.length, reviewHtml, currentChapterName);
         };
 
-        // For practice mode (series) finish
         function finishPractice() {
             if (!quizActive) return;
             quizActive = false;
@@ -743,7 +769,6 @@
             document.getElementById('final-score').innerHTML = `${correct} <span style="font-size:2rem;">/ ${total}</span>`;
             document.getElementById('review-container').innerHTML = reviewHtml;
 
-            // Store stats under the topic name
             let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
             if (!stats[topicName]) stats[topicName] = { total:0, correct:0, time:0 };
             stats[topicName].total += total;
@@ -753,7 +778,7 @@
             displayHomeStats();
         }
 
-        // ---------- PSYCHO FLASHCARD (unchanged core) ----------
+        // ---------- PSYCHO FLASHCARD ----------
         async function startPsychoFlashcard() {
             const checkboxes = document.querySelectorAll('#chapter-list input[type="checkbox"]:checked');
             const selectedChaps = Array.from(checkboxes).map(cb => cb.value);
@@ -783,7 +808,7 @@
             document.getElementById('practice-wrong-btn').classList.remove('hidden');
 
             currentMode = 'psycho';
-            currentChapterName = 'Psycho Flashcard'; // for stats
+            currentChapterName = 'Psycho Flashcard';
             quizActive = true;
             startTime = Date.now();
             if (timerInterval) clearInterval(timerInterval);
@@ -848,7 +873,9 @@
         function renderFlashcardQuestion() {
             let q = shownQuestions[currentIndex];
             let ans = shownAnswers[currentIndex];
-            document.getElementById('question-text').innerText = `${currentIndex+1}. ${q.q}`;
+            // Add search button next to question text
+            let searchBtnHtml = `<button class="btn btn-small" onclick="searchCurrentQuestion()" style="margin-left: 1rem;">🔍 Search</button>`;
+            document.getElementById('question-text').innerHTML = `${currentIndex+1}. ${q.q} ${searchBtnHtml}`;
             let optsHtml = q.options.map((opt, idx) => {
                 let checked = (ans.selected === idx) ? 'checked' : '';
                 return `<label id="opt-${idx}" class="option-label"><input type="radio" name="flash-opt" value="${idx}" ${checked} onchange="onFlashcardAnswer(${idx})"> ${opt}</label>`;
@@ -885,7 +912,7 @@
             maybeFetchNextFile();
         };
 
-        window.nextFlashcard = async function() {
+        async function nextFlashcard() {
             document.getElementById('nextBtn').disabled = true;
             let nextQ = pickQuestionFromPool();
             if (nextQ) showFlashcardQuestion(nextQ);
@@ -940,6 +967,88 @@
             displayResults(correct, incorrect, skipped, shownQuestions.length, reviewHtml, 'Psycho Flashcard');
         }
 
+        // ---------- PSYCHO EXAM (100 random) with progress ----------
+        async function startPsychoExam() {
+            const checkboxes = document.querySelectorAll('#chapter-list input[type="checkbox"]:checked');
+            const selectedChaps = Array.from(checkboxes).map(cb => cb.value);
+            if (selectedChaps.length === 0) { alert('Please select at least one chapter.'); return; }
+
+            let fileIds = [];
+            for (let chap of selectedChaps) {
+                let subtopics = DRIVE_FILES[chap] || {};
+                for (let fid of Object.values(subtopics)) if (fid && fid.trim() !== '') fileIds.push(fid);
+            }
+            if (fileIds.length === 0) { alert('No valid file IDs found.'); return; }
+
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('loading').innerHTML = 'Fetching questions for exam... <span id="fetch-progress">0/0</span>';
+
+            let allQuestions = [];
+            const totalFiles = fileIds.length;
+            let fetchedCount = 0;
+
+            function updateProgress() {
+                const progressSpan = document.getElementById('fetch-progress');
+                if (progressSpan) progressSpan.innerText = `${fetchedCount}/${totalFiles}`;
+            }
+            updateProgress();
+
+            for (let fileId of fileIds) {
+                try {
+                    let res = await fetch(`${APPS_SCRIPT_URL}?id=${fileId}`);
+                    if (!res.ok) continue;
+                    let qs = await res.json();
+                    let normalized = normalizeQuestions(qs, fileId);
+                    allQuestions.push(...normalized);
+                } catch (e) {
+                    console.warn(`Failed to fetch ${fileId}`);
+                }
+                fetchedCount++;
+                updateProgress();
+            }
+
+            if (allQuestions.length === 0) {
+                alert('No questions could be loaded.');
+                document.getElementById('home-view').classList.remove('hidden');
+                document.getElementById('loading').classList.add('hidden');
+                return;
+            }
+
+            allQuestions = shuffleArray(allQuestions);
+            let examQuestions = allQuestions.slice(0, 100);
+
+            questions = examQuestions;
+            currentChapterName = 'Psycho Exam (100 random)';
+            currentMode = 'standardExam';
+
+            document.getElementById('loading').classList.add('hidden');
+            startStandardQuiz('exam');
+        }
+
+        // ---------- SEARCH FUNCTION (question + options) ----------
+        window.searchCurrentQuestion = function() {
+            let questionText = '';
+            let options = [];
+            if (currentMode === 'standardPractice' && questions[currentIndex]) {
+                questionText = questions[currentIndex].q;
+                options = questions[currentIndex].options || [];
+            } else if (currentMode === 'psycho' && shownQuestions[currentIndex]) {
+                questionText = shownQuestions[currentIndex].q;
+                options = shownQuestions[currentIndex].options || [];
+            } else {
+                return;
+            }
+            // Build search query: question + options
+            let query = questionText;
+            if (options.length > 0) {
+                query += ' ' + options.join(' ');
+            }
+            // Encode for URL and open Google search
+            const encoded = encodeURIComponent(query);
+            window.open(`https://www.google.com/search?q=${encoded}`, '_blank');
+        };
+
         // ---------- SHARED SUBMIT ----------
         window.submitQuiz = function() {
             if (!quizActive) return;
@@ -948,7 +1057,7 @@
             else if (currentMode === 'psycho') submitPsychoResults();
         };
 
-        // ---------- PRACTICE WRONG (works for all modes) ----------
+        // ---------- PRACTICE WRONG ----------
         window.practiceWrong = function() {
             let wrongQs, wrongAnswers, sourceChapter;
             if (currentMode === 'standardExam') {
@@ -967,7 +1076,6 @@
 
             if (wrongQs.length === 0) { alert('No wrong answers!'); return; }
 
-            // Start a new practice session with wrong questions
             questions = wrongQs.map(q => ({...q}));
             practiceAnswers = wrongAnswers;
             currentMode = 'standardPractice';
@@ -1021,6 +1129,7 @@
         window.fetchAndStart = fetchAndStart;
         window.loadLocalFile = loadLocalFile;
         window.startPsychoFlashcard = startPsychoFlashcard;
+        window.startPsychoExam = startPsychoExam;
         window.selectAllChapters = selectAllChapters;
         window.deselectAllChapters = deselectAllChapters;
         window.practiceWrong = practiceWrong;
@@ -1049,8 +1158,6 @@
         updateTopics();
         buildChapterList();
         displayHomeStats();
-
-        // Note on adding topics: edit DRIVE_FILES object with new chapter numbers and subtopics (file IDs)
     })();
 </script>
 </body>
