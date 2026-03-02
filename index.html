@@ -217,15 +217,44 @@
         footer { text-align: center; margin-top: 2rem; color: #64748b; font-size: 0.8rem; }
 
         @media (max-width: 600px) {
-            .navbar h2 { font-size: 1.2rem; }
-            .container { padding: 0 0.8rem; margin: 1rem auto; }
-            .hero-card { padding: 1.2rem; }
-            h1 { font-size: 1.5rem; }
-            .quiz-header { flex-direction: column; align-items: stretch; }
-            .nav-buttons { display: flex; gap: 0.5rem; }
-            .btn { padding: 0.6rem 1rem; }
-            .btn-small { padding: 0.2rem 0.5rem; font-size: 0.75rem; }
-        }
+    .navbar h2 { font-size: 1.2rem; }
+    .container { padding: 0 0.8rem; margin: 1rem auto; }
+    .hero-card { padding: 1.2rem; }
+    h1 { font-size: 1.5rem; }
+
+    /* Compact quiz header */
+    .quiz-header {
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 0.5rem;
+        gap: 0.3rem;
+        top: 70px; /* adjust for smaller navbar */
+    }
+    .mode-badge {
+        font-size: 0.8rem;
+        padding: 0.2rem 0.8rem;
+    }
+    .timer {
+        font-size: 1rem;
+        margin-left: auto; /* push timer to right if space */
+    }
+    .nav-buttons {
+        display: flex;
+        gap: 0.3rem;
+        width: auto;
+        flex: 1 1 auto;
+        justify-content: flex-end;
+    }
+    .nav-buttons .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        white-space: nowrap; /* prevent button text wrapping */
+    }
+
+    /* Existing button styles */
+    .btn { padding: 0.6rem 1rem; }
+    .btn-small { padding: 0.2rem 0.5rem; font-size: 0.75rem; }
+}
 
                 /* ===== FIXED NAVIGATION BUTTONS FOR PRACTICE MODE ===== */
 #flashcard-ui {
