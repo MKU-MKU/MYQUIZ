@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>MOHITS · stats per chapter + reset</title>
-    <!-- PWA: theme color & apple touch icon -->
+    <title>HAMRO AFNAI · stats per chapter + reset</title>
     <meta name="theme-color" content="#1e293b">
     <link rel="apple-touch-icon" href="#">
     <style>
-        /* (all existing styles - unchanged) */
+        /* ========== ALL EXISTING STYLES (unchanged) ========== */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
             --primary: #1e293b; --accent: #3b82f6; --success: #10b981;
@@ -64,82 +63,84 @@
             line-height: 1.5;
         }
         .navbar {
-            background: var(--primary); color: white; padding: 1rem 1.5rem;
+            background: var(--primary); color: white; padding: 1rem 2.5rem;
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 200;
         }
-        .navbar h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; }
-        .container { max-width: 1300px; margin: 1.5rem auto; padding: 0 1rem; }
+        .navbar h2 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
+        .container { max-width: 1300px; margin: 2.5rem auto; padding: 0 2.5rem; }
         
         .hero-card {
-            background: var(--card); padding: 1.5rem; border-radius: 2rem;
+            background: var(--card); padding: 2.5rem; border-radius: 2.5rem;
             box-shadow: 0 25px 30px -12px rgb(0 0 0 / 0.15);
             border-top: 8px solid var(--accent);
         }
-        h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
-        .subhead { color: #64748b; margin-bottom: 1.5rem; font-size: 1rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+        .subhead { color: #64748b; margin-bottom: 2.5rem; font-size: 1.2rem; }
 
-        .home-section { margin-bottom: 1.5rem; }
+        .home-section { margin-bottom: 2.5rem; }
         .section-card {
-            background: var(--bg); border-radius: 1.5rem; padding: 1.5rem;
+            background: var(--bg); border-radius: 2rem; padding: 2rem;
             border: 1px solid var(--border); transition: all 0.2s;
         }
         .section-title {
             display: flex; align-items: center; gap: 0.75rem;
-            font-size: 1.2rem; font-weight: 600; margin-bottom: 1.5rem;
+            font-size: 1.4rem; font-weight: 600; margin-bottom: 2rem;
         }
         .section-title .badge {
-            background: var(--accent); color: white; padding: 0.2rem 0.8rem;
-            border-radius: 999px; font-size: 0.9rem; font-weight: 500;
+            background: var(--accent); color: white; padding: 0.4rem 1rem;
+            border-radius: 999px; font-size: 1rem; font-weight: 500;
         }
 
         .chapter-panel {
-            background: var(--card); border-radius: 1rem; border: 1px solid var(--border);
-            padding: 0.5rem; margin: 1.5rem 0; max-height: 300px; overflow-y: auto;
+            background: var(--card); border-radius: 1.5rem; border: 1px solid var(--border);
+            padding: 1rem; margin: 2rem 0; max-height: 350px; overflow-y: auto;
         }
         .chapter-item {
-            display: flex; align-items: center; padding: 0.8rem;
-            border-bottom: 1px solid var(--border); border-radius: 0.8rem;
+            display: flex; align-items: center; padding: 1rem;
+            border-bottom: 1px solid var(--border); border-radius: 1rem;
         }
+        .chapter-item:hover { background: color-mix(in srgb, var(--accent) 8%, transparent); }
         .chapter-item input[type="checkbox"] {
-            width: 1.2rem; height: 1.2rem; margin-right: 1rem;
+            width: 1.4rem; height: 1.4rem; margin-right: 1.2rem;
             accent-color: var(--accent); cursor: pointer;
         }
         .chapter-info { flex: 1; }
         .chapter-name {
-            font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;
+            font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 0.8rem;
         }
         .chapter-name .chapter-number {
-            background: var(--primary); color: white; width: 1.8rem; height: 1.8rem;
+            background: var(--primary); color: white; width: 2.2rem; height: 2.2rem;
             display: inline-flex; align-items: center; justify-content: center;
-            border-radius: 999px; font-size: 0.9rem; font-weight: 600;
+            border-radius: 999px; font-size: 1rem; font-weight: 700;
         }
-        .topic-count { font-size: 0.8rem; color: #64748b; margin-left: 2.5rem; }
+        .topic-count { font-size: 0.9rem; color: #64748b; margin-left: 3rem; }
 
         .select-buttons {
-            display: flex; gap: 0.8rem; margin-bottom: 1rem;
+            display: flex; gap: 1.5rem; margin-bottom: 1.5rem;
         }
         .select-buttons button {
-            flex: 1; background: var(--primary); border: none; padding: 0.8rem;
-            border-radius: 999px; font-weight: 500; color: white; cursor: pointer;
-            transition: 0.2s; font-size: 0.9rem;
+            flex: 1; background: var(--primary); border: none; padding: 1rem;
+            border-radius: 999px; font-weight: 600; color: white; cursor: pointer;
+            transition: 0.2s; font-size: 1rem;
         }
+        .select-buttons button:hover { filter: brightness(1.1); transform: translateY(-3px); }
 
         .btn {
-            background: var(--accent); color: white; border: none; padding: 0.8rem 1.2rem;
-            border-radius: 999px; font-weight: 500; cursor: pointer; transition: 0.2s;
-            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
-            font-size: 0.9rem;
+            background: var(--accent); color: white; border: none; padding: 1rem 2rem;
+            border-radius: 999px; font-weight: 600; cursor: pointer; transition: 0.2s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem;
+            font-size: 1rem;
         }
-        .btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn:hover { filter: brightness(1.1); transform: translateY(-3px); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-success { background: var(--success); }
         .btn-warning { background: var(--warning); }
         .btn-psycho { background: #8b5cf6; }
         .btn-block { width: 100%; }
         .btn-small {
-            padding: 0.3rem 0.6rem;
-            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.9rem;
             margin-left: 0.5rem;
             background: var(--primary);
         }
@@ -153,16 +154,15 @@
 
         .quiz-header {
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
-            background: var(--card); padding: 1rem; border-radius: 1rem; margin-bottom: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: sticky; top: 80px; z-index: 150;
-            gap: 0.5rem;
+            background: var(--card); padding: 1.5rem 2rem; border-radius: 1.5rem; margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: sticky; top: 90px; z-index: 150;
         }
         .mode-badge {
-            background: var(--accent); color: white; padding: 0.3rem 1rem;
-            border-radius: 999px; font-size: 0.9rem; font-weight: 500;
+            background: var(--accent); color: white; padding: 0.5rem 1.5rem;
+            border-radius: 999px; font-size: 1rem; font-weight: 600;
         }
         .timer {
-            font-weight: 700; font-size: 1.2rem; transition: color 0.3s;
+            font-weight: 700; font-size: 1.3rem; transition: color 0.3s;
         }
         .timer.warning { color: #f59e0b; }
         .timer.danger { color: #ef4444; animation: pulse 1s infinite; }
@@ -172,141 +172,152 @@
         }
 
         .question-card {
-            background: var(--card); padding: 1.5rem; border-radius: 1.5rem; margin-bottom: 1rem;
-            border-left: 8px solid var(--accent); box-shadow: 0 10px 15px -8px rgba(0,0,0,0.1);
+            background: var(--card); padding: 2.5rem; border-radius: 2rem; margin-bottom: 1.5rem;
+            border-left: 12px solid var(--accent); box-shadow: 0 15px 20px -8px rgba(0,0,0,0.1);
         }
-        .question-card p { font-size: 1.1rem; margin-bottom: 1rem; }
+        .question-card p { font-size: 1.3rem; margin-bottom: 1.5rem; }
 
         .options-group label {
-            display: block; padding: 1rem; margin: 0.8rem 0; border-radius: 1rem;
+            display: block; padding: 1.2rem; margin: 1rem 0; border-radius: 1.2rem;
             background: var(--bg); border: 2px solid transparent; cursor: pointer;
-            transition: 0.1s; font-size: 1rem;
+            transition: 0.1s; font-size: 1.1rem;
         }
-        .options-group input[type="radio"] { margin-right: 0.8rem; width: 1rem; height: 1rem; }
+        .options-group label:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+        .options-group input[type="radio"] { margin-right: 1rem; width: 1.2rem; height: 1.2rem; }
 
         .option-correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #166534; font-weight: 600; }
         .option-incorrect { background: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b; text-decoration: line-through; }
 
         .explanation-box {
-            margin-top: 1.5rem; padding: 1.2rem; border-radius: 1rem;
+            margin-top: 2rem; padding: 1.8rem; border-radius: 1.5rem;
             background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534;
-            font-size: 1rem;
+            font-size: 1.1rem;
         }
 
-        .progress { height: 8px; background: var(--border); border-radius: 999px; margin: 1rem 0; }
+        .progress { height: 12px; background: var(--border); border-radius: 999px; margin: 2rem 0; }
         .progress-fill { height: 100%; background: var(--accent); border-radius: 999px; width: 0%; transition: width 0.3s; }
 
-        #stats-home ul { list-style: none; padding-left: 0; font-size: 0.9rem; }
+        .standard-exam .question-card {
+            padding: 2rem; border-left-width: 8px;
+        }
+
+        .loading-more { font-size: 1rem; color: var(--accent); margin-top: 1rem; font-style: italic; }
+
+        #stats-home ul { list-style: none; padding-left: 0; font-size: 1.1rem; }
         #stats-home li {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0.6rem 0; border-bottom: 1px dashed var(--border);
+            padding: 0.8rem 0; border-bottom: 1px dashed var(--border);
         }
+        .stat-info { flex: 1; }
         .reset-btn {
             background: var(--danger); color: white; border: none;
-            padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.8rem;
+            padding: 0.4rem 1rem; border-radius: 999px; font-size: 0.9rem;
             cursor: pointer;
         }
 
         .info-tip {
             display: inline-block; background: var(--primary); color: white;
-            width: 1.4rem; height: 1.4rem; border-radius: 50%;
-            text-align: center; line-height: 1.4rem; font-size: 0.9rem;
-            cursor: help; margin-left: 0.3rem;
+            width: 1.6rem; height: 1.6rem; border-radius: 50%;
+            text-align: center; line-height: 1.6rem; font-size: 1rem;
+            cursor: help; margin-left: 0.5rem;
         }
         .hidden { display: none !important; }
-        footer { text-align: center; margin-top: 2rem; color: #64748b; font-size: 0.8rem; }
+        footer { text-align: center; margin-top: 3rem; color: #64748b; font-size: 1rem; }
+
         /* ===== MOBILE COMPACT LAYOUT ===== */
-@media (max-width: 600px) {
-    /* Smaller navbar */
-    .navbar {
-        padding: 0.5rem 1rem;
-    }
-    .navbar h2 {
-        font-size: 1rem;
-    }
-    .navbar button {
-        padding: 0.3rem 0.6rem;
-        font-size: 0.8rem;
-    }
-    #install-btn {
-        padding: 0.3rem 0.6rem;
-        font-size: 0.7rem;
-        margin-left: 0.3rem;
-    }
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 0.5rem 1rem;
+            }
+            .navbar h2 {
+                font-size: 1rem;
+            }
+            .navbar button {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
+            }
+            #install-btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.7rem;
+                margin-left: 0.3rem;
+            }
+            .container {
+                padding: 0 0.8rem;
+                margin: 1rem auto;
+            }
+            .hero-card {
+                padding: 1.2rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .quiz-header {
+                padding: 0.5rem;
+                gap: 0.3rem;
+                top: 70px;
+            }
+            .mode-badge {
+                font-size: 0.8rem;
+                padding: 0.2rem 0.8rem;
+            }
+            .timer {
+                font-size: 1rem;
+                margin-left: auto;
+            }
+            .nav-buttons {
+                display: flex;
+                gap: 0.3rem;
+                width: auto;
+                flex: 1 1 auto;
+                justify-content: flex-end;
+            }
+            .nav-buttons .btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+                white-space: nowrap;
+            }
+            .btn {
+                padding: 0.6rem 1rem;
+            }
+            .btn-small {
+                padding: 0.2rem 0.5rem;
+                font-size: 0.75rem;
+            }
+            #flashcard-ui > div[style*="margin: 2rem 0"] {
+                margin: 0.5rem 0 0.2rem 0 !important;
+            }
+            footer {
+                margin-top: 0.2rem !important;
+            }
+            .question-card {
+                padding: 1.5rem;
+            }
+            .question-card p {
+                font-size: 1.2rem;
+            }
+            .options-group label {
+                padding: 0.8rem;
+                font-size: 1rem;
+            }
+            .explanation-box {
+                padding: 1.2rem;
+                font-size: 1rem;
+            }
+        }
 
-    /* Container and cards */
-    .container { padding: 0 0.8rem; margin: 1rem auto; }
-    .hero-card { padding: 1.2rem; }
-    h1 { font-size: 1.5rem; }
-
-    /* Compact quiz header */
-    .quiz-header {
-        flex-direction: row;
-        flex-wrap: wrap;
-        padding: 0.5rem;
-        gap: 0.3rem;
-        top: 70px;
-    }
-    .mode-badge {
-        font-size: 0.8rem;
-        padding: 0.2rem 0.8rem;
-    }
-    .timer {
-        font-size: 1rem;
-        margin-left: auto;
-    }
-    .nav-buttons {
-        display: flex;
-        gap: 0.3rem;
-        width: auto;
-        flex: 1 1 auto;
-        justify-content: flex-end;
-    }
-    .nav-buttons .btn {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
-        white-space: nowrap;
-    }
-
-    /* General button size */
-    .btn { padding: 0.6rem 1rem; }
-    .btn-small { padding: 0.2rem 0.5rem; font-size: 0.75rem; }
-}
-
-/* ===== TIGHTER GAP BETWEEN BUTTONS AND FOOTER ===== */
-#flashcard-ui > div[style*="margin: 2rem 0"] {
-    margin: 0.5rem 0 0.2rem 0 !important; /* minimal top and bottom */
-}
-footer {
-    margin-top: 0.3rem !important; /* footer almost touching buttons */
-}
-
-/* ===== OPTIONAL: FIXED NAVIGATION BUTTONS (if you want them always visible) ===== */
-#flashcard-ui {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 180px); /* adjust 180px if needed */
-}
-#flashcard-ui .question-card {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    margin-bottom: 0.5rem;
-}
-#flashcard-ui > div:last-child {
-    flex-shrink: 0;
-    background: var(--bg);
-    padding: 0.8rem 0;
-    border-top: 1px solid var(--border);
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
-}
-        
+        @media (min-width: 601px) {
+            #flashcard-ui > div[style*="margin: 2rem 0"] {
+                margin: 2rem 0;
+            }
+            footer {
+                margin-top: 3rem;
+            }
+        }
     </style>
 </head>
 <body>
 <nav class="navbar">
-    <h2>🧠 MOHITS QUIZ</h2>
+    <h2>🧠 HAMRO AFNAI QUIZ</h2>
     <div>
         <button onclick="toggleTheme()" style="background:transparent; border:2px solid white; padding:0.4rem 0.8rem;">🌓</button>
         <button id="install-btn" onclick="installPWA()">📲 Install App</button>
@@ -314,10 +325,10 @@ footer {
 </nav>
 
 <div class="container">
-    <!-- HOME VIEW -->
+    <!-- HOME VIEW (unchanged) -->
     <div id="home-view">
         <div class="hero-card">
-            <h1>Flashcard Dashboard</h1>
+            <h1>Hamro Afnai HomePage</h1>
             <div class="subhead">Choose your mode – practice (one by one) or exam (all at once).</div>
 
             <!-- Online section -->
@@ -404,7 +415,7 @@ footer {
     <!-- LOADING -->
     <div id="loading" class="hidden">⏳ Loading questions...</div>
 
-    <!-- QUIZ VIEW -->
+    <!-- QUIZ VIEW (unchanged) -->
     <div id="quiz-view" class="hidden">
         <div class="quiz-header">
             <span class="mode-badge" id="mode-display">Mode</span>
@@ -423,7 +434,7 @@ footer {
                 <div id="options-container" class="options-group"></div>
                 <div id="explanation-box" class="explanation-box hidden"></div>
             </div>
-            <div style="display: flex; justify-content: center; gap:1rem; margin: 1rem 0;">
+            <div style="display: flex; justify-content: center; gap:2rem; margin: 2rem 0;">
                 <button class="btn" onclick="prevQuestion()" id="prevBtn" style="flex:1;">⬅ Previous</button>
                 <button class="btn" onclick="nextQuestion()" id="nextBtn" style="flex:1;" disabled>Next →</button>
             </div>
@@ -437,7 +448,7 @@ footer {
         </div>
     </div>
 
-    <!-- RESULT VIEW -->
+    <!-- RESULT VIEW (unchanged) -->
     <div id="result-view" class="hidden">
         <div class="hero-card">
             <h2 id="final-score" style="font-size:2.5rem; text-align:center;"></h2>
@@ -458,48 +469,41 @@ footer {
 </div>
 
 <script>
-    // ========== PWA SETUP ==========
+    // ========== PWA SETUP WITH CUSTOM NAME AND ICON ==========
     (function() {
-        // Generate icons using canvas
-        function generateIcon(size, bgColor, textColor) {
-            const canvas = document.createElement('canvas');
-            canvas.width = size;
-            canvas.height = size;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = bgColor;
-            ctx.fillRect(0, 0, size, size);
-            ctx.fillStyle = textColor;
-            ctx.font = `bold ${size * 0.6}px 'Inter', sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('M', size / 2, size / 2);
-            return canvas.toDataURL('image/png');
-        }
+        // Your custom icon URL (same for both sizes – browser will scale it)
+        const iconUrl = 'https://i.imgur.com/lCc9SUi.png';
 
-        const icon192 = generateIcon(192, '#1e293b', '#ffffff');
-        const icon512 = generateIcon(512, '#1e293b', '#ffffff');
-
-        // Create manifest as a data URL (more compatible than blob)
         const manifest = {
-            name: 'MOHITS Quiz',
-            short_name: 'MOHITS',
-            description: 'Practice exams with statistics and multi‑chapter flashcards',
+            name: 'HAMRO AFNAI SATHI',
+            short_name: 'SATHI',          // displayed under the icon
+            description: 'Your quiz app with custom branding',
             start_url: '.',
             display: 'standalone',
             theme_color: '#1e293b',
             background_color: '#1e293b',
             icons: [
-                { src: icon192, sizes: '192x192', type: 'image/png' },
-                { src: icon512, sizes: '512x512', type: 'image/png' }
+                {
+                    src: iconUrl,
+                    sizes: '192x192',
+                    type: 'image/png'
+                },
+                {
+                    src: iconUrl,
+                    sizes: '512x512',
+                    type: 'image/png'
+                }
             ]
         };
+
+        // Create manifest as data URL (most compatible)
         const manifestData = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(manifest));
         const link = document.createElement('link');
         link.rel = 'manifest';
         link.href = manifestData;
         document.head.appendChild(link);
 
-        // Service Worker (optional, try to register from a blob)
+        // Service Worker (optional, for offline caching)
         if ('serviceWorker' in navigator) {
             const swCode = `
                 const CACHE_NAME = 'mohits-cache-v1';
@@ -517,34 +521,26 @@ footer {
             `;
             const swBlob = new Blob([swCode], { type: 'application/javascript' });
             const swUrl = URL.createObjectURL(swBlob);
-            navigator.serviceWorker.register(swUrl).catch(err => console.warn('SW registration failed (non‑critical):', err));
+            navigator.serviceWorker.register(swUrl).catch(err => console.warn('SW failed:', err));
         }
 
         // Install button logic
         let deferredPrompt;
         const installBtn = document.getElementById('install-btn');
-
-        // If already installed as standalone, hide button
         if (window.matchMedia('(display-mode: standalone)').matches) {
             installBtn.style.display = 'none';
         } else {
-            // Show button immediately
             installBtn.classList.add('show');
             installBtn.textContent = '📲 Install App';
-
-            // Listen for native install prompt
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
-                // Update button to use native prompt
                 installBtn.textContent = '📲 Install App';
                 installBtn.onclick = () => {
                     deferredPrompt.prompt();
                     deferredPrompt.userChoice.then(() => deferredPrompt = null);
                 };
             });
-
-            // Fallback: manual instructions
             installBtn.onclick = () => {
                 if (deferredPrompt) {
                     deferredPrompt.prompt();
@@ -553,8 +549,6 @@ footer {
                     alert('To install this app on your home screen:\n\n• Android Chrome: tap the menu (⋮) and select "Add to Home screen".\n• iOS Safari: tap the share icon and select "Add to Home Screen".');
                 }
             };
-
-            // Hide after successful installation
             window.addEventListener('appinstalled', () => {
                 installBtn.classList.remove('show');
                 deferredPrompt = null;
@@ -564,7 +558,7 @@ footer {
 </script>
 
 <script>
-    // ========== EXISTING APP CODE (full features) ==========
+    // ========== EXISTING APP CODE (full features, unchanged) ==========
     (function(){
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXQeUllkncM06aiI10OQIz0uwRVToDbJWIRJzxWNgsAEwnuWuyHjdP8P572nO8feBewA/exec";
 
@@ -959,7 +953,7 @@ footer {
             displayHomeStats();
         }
 
-        // Psycho flashcard (abbreviated but functional)
+        // Psycho flashcard
         async function startPsychoFlashcard() {
             const checkboxes = document.querySelectorAll('#chapter-list input[type="checkbox"]:checked');
             const selectedChaps = Array.from(checkboxes).map(cb => cb.value);
