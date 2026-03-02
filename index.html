@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#1e293b">
     <link rel="apple-touch-icon" href="#">
     <style>
+        /* (all existing styles - unchanged) */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
             --primary: #1e293b; --accent: #3b82f6; --success: #10b981;
@@ -19,7 +20,6 @@
             --danger: #f87171; --warning: #fbbf24; --bg: #0f172a; --card: #1e293b;
             --text: #f1f5f9; --border: #334155;
         }
-        /* Dark mode specific overrides */
         .dark-mode .option-correct {
             background: #1e3a2e !important;
             border-color: #34d399 !important;
@@ -382,110 +382,109 @@
 </div>
 
 <script>
-   // ========== PWA SETUP ==========
-(function() {
-    // Generate icons using canvas
-    function generateIcon(size, bgColor, textColor) {
-        const canvas = document.createElement('canvas');
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, size, size);
-        ctx.fillStyle = textColor;
-        ctx.font = `bold ${size * 0.6}px 'Inter', sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('M', size / 2, size / 2);
-        return canvas.toDataURL('image/png');
-    }
+    // ========== PWA SETUP ==========
+    (function() {
+        // Generate icons using canvas
+        function generateIcon(size, bgColor, textColor) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, size, size);
+            ctx.fillStyle = textColor;
+            ctx.font = `bold ${size * 0.6}px 'Inter', sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('M', size / 2, size / 2);
+            return canvas.toDataURL('image/png');
+        }
 
-    const icon192 = generateIcon(192, '#1e293b', '#ffffff');
-    const icon512 = generateIcon(512, '#1e293b', '#ffffff');
+        const icon192 = generateIcon(192, '#1e293b', '#ffffff');
+        const icon512 = generateIcon(512, '#1e293b', '#ffffff');
 
-    const manifest = {
-        name: 'MOHITS Quiz',
-        short_name: 'MOHITS',
-        description: 'Practice exams with statistics and multi‑chapter flashcards',
-        start_url: '.',
-        display: 'standalone',
-        theme_color: '#1e293b',
-        background_color: '#1e293b',
-        icons: [
-            { src: icon192, sizes: '192x192', type: 'image/png' },
-            { src: icon512, sizes: '512x512', type: 'image/png' }
-        ]
-    };
-
-    const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-    const manifestUrl = URL.createObjectURL(manifestBlob);
-    const link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = manifestUrl;
-    document.head.appendChild(link);
-
-    // Service Worker (optional, for offline caching)
-    if ('serviceWorker' in navigator) {
-        const swCode = `
-            const CACHE_NAME = 'mohits-cache-v1';
-            const urlsToCache = [location.href];
-            self.addEventListener('install', event => {
-                event.waitUntil(
-                    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
-                );
-            });
-            self.addEventListener('fetch', event => {
-                event.respondWith(
-                    caches.match(event.request).then(response => response || fetch(event.request))
-                );
-            });
-        `;
-        const swBlob = new Blob([swCode], { type: 'application/javascript' });
-        const swUrl = URL.createObjectURL(swBlob);
-        navigator.serviceWorker.register(swUrl).catch(err => console.warn('SW failed:', err));
-    }
-
-    // Install button logic
-    let deferredPrompt;
-    const installBtn = document.getElementById('install-btn');
-
-    // If already installed as standalone, hide button
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        installBtn.style.display = 'none';
-    } else {
-        // Show button immediately (with default action)
-        installBtn.classList.add('show');
-        installBtn.textContent = '📲 Install App';
-
-        // Listen for the beforeinstallprompt event (native install)
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            // Update button to use native prompt
-            installBtn.textContent = '📲 Install App';
-            installBtn.onclick = () => {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => deferredPrompt = null);
-            };
-        });
-
-        // Fallback: if no native prompt, clicking shows manual instructions
-        installBtn.onclick = () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => deferredPrompt = null);
-            } else {
-                alert('To install this app on your home screen, use your browser\'s menu (e.g., "Add to Home screen" or "Install app").');
-            }
+        // Create manifest as a data URL (more compatible than blob)
+        const manifest = {
+            name: 'MOHITS Quiz',
+            short_name: 'MOHITS',
+            description: 'Practice exams with statistics and multi‑chapter flashcards',
+            start_url: '.',
+            display: 'standalone',
+            theme_color: '#1e293b',
+            background_color: '#1e293b',
+            icons: [
+                { src: icon192, sizes: '192x192', type: 'image/png' },
+                { src: icon512, sizes: '512x512', type: 'image/png' }
+            ]
         };
+        const manifestData = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(manifest));
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = manifestData;
+        document.head.appendChild(link);
 
-        // Hide button after successful installation
-        window.addEventListener('appinstalled', () => {
-            installBtn.classList.remove('show');
-            deferredPrompt = null;
-        });
-    }
-})();
+        // Service Worker (optional, try to register from a blob)
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'mohits-cache-v1';
+                const urlsToCache = [location.href];
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+                    );
+                });
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request).then(response => response || fetch(event.request))
+                    );
+                });
+            `;
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(swBlob);
+            navigator.serviceWorker.register(swUrl).catch(err => console.warn('SW registration failed (non‑critical):', err));
+        }
+
+        // Install button logic
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+
+        // If already installed as standalone, hide button
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            installBtn.style.display = 'none';
+        } else {
+            // Show button immediately
+            installBtn.classList.add('show');
+            installBtn.textContent = '📲 Install App';
+
+            // Listen for native install prompt
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                // Update button to use native prompt
+                installBtn.textContent = '📲 Install App';
+                installBtn.onclick = () => {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(() => deferredPrompt = null);
+                };
+            });
+
+            // Fallback: manual instructions
+            installBtn.onclick = () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(() => deferredPrompt = null);
+                } else {
+                    alert('To install this app on your home screen:\n\n• Android Chrome: tap the menu (⋮) and select "Add to Home screen".\n• iOS Safari: tap the share icon and select "Add to Home Screen".');
+                }
+            };
+
+            // Hide after successful installation
+            window.addEventListener('appinstalled', () => {
+                installBtn.classList.remove('show');
+                deferredPrompt = null;
+            });
+        }
+    })();
 </script>
 
 <script>
