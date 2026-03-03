@@ -144,6 +144,19 @@
             margin-left: 0.5rem;
             background: var(--primary);
         }
+        /* Star button for bookmark */
+        .btn-star {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            font-size: 1.2rem;
+            padding: 0.3rem 0.6rem;
+            margin-left: 0.5rem;
+        }
+        .btn-star.bookmarked {
+            background: var(--accent);
+            color: white;
+        }
 
         #install-btn {
             background: white; color: var(--primary); border: none;
@@ -422,6 +435,19 @@
                 </div>
             </div>
 
+            <!-- NEW: BOOKMARK REVIEW SECTION -->
+            <div class="home-section">
+                <div class="section-card">
+                    <div class="section-title">
+                        <span class="badge">📌</span> Your Bookmarks
+                    </div>
+                    <p style="margin-bottom:1rem;">Review only the questions you have starred (★).</p>
+                    <button class="btn btn-block" onclick="startBookmarkReview()" style="background:#8b5cf6;">
+                        ⭐ Review Bookmarks
+                    </button>
+                </div>
+            </div>
+
             <!-- Statistics -->
             <div class="home-section">
                 <div class="section-card">
@@ -488,7 +514,7 @@
             <div id="review-container" style="margin-top:1.5rem;"></div>
         </div>
     </div>
-    <footer>practice · exam · wrong · stats per chapter</footer>
+    <footer>practice · exam · wrong · stats per chapter · bookmarks</footer>
 </div>
 
 <script>
@@ -581,7 +607,7 @@
 </script>
 
 <script>
-    // ========== EXISTING APP CODE (full features, with FIX for Psycho Finish) ==========
+    // ========== EXISTING APP CODE (full features, with BOOKMARK feature added) ==========
     (function(){
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXQeUllkncM06aiI10OQIz0uwRVToDbJWIRJzxWNgsAEwnuWuyHjdP8P572nO8feBewA/exec";
 
@@ -635,6 +661,59 @@
         let shownQuestions = [];
         let shownAnswers = [];
 
+        // ---------- BOOKMARK FEATURE ----------
+        let bookmarks = []; // array of full question objects
+
+        function loadBookmarks() {
+            try {
+                bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+            } catch (e) {
+                bookmarks = [];
+            }
+        }
+        function saveBookmarks() {
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+        }
+        function isBookmarked(uid) {
+            return bookmarks.some(b => b.uid === uid);
+        }
+        function toggleBookmark(question) {
+            if (!question.uid) return;
+            const idx = bookmarks.findIndex(b => b.uid === question.uid);
+            if (idx === -1) {
+                // Add a copy to avoid reference issues
+                bookmarks.push({ ...question });
+            } else {
+                bookmarks.splice(idx, 1);
+            }
+            saveBookmarks();
+            // Update star button if it exists
+            const starBtn = document.getElementById('star-btn-' + question.uid);
+            if (starBtn) {
+                if (idx === -1) {
+                    starBtn.classList.add('bookmarked');
+                    starBtn.textContent = '★';
+                } else {
+                    starBtn.classList.remove('bookmarked');
+                    starBtn.textContent = '☆';
+                }
+            }
+        }
+
+        // Call this to get the HTML for the star button
+        function renderStarButton(question) {
+            const uid = question.uid;
+            const bookmarked = isBookmarked(uid);
+            return `<button id="star-btn-${uid}" class="btn btn-star ${bookmarked ? 'bookmarked' : ''}" onclick="window.toggleBookmarkFromObject(${JSON.stringify(question).replace(/"/g, '&quot;')})">${bookmarked ? '★' : '☆'}</button>`;
+        }
+
+        // Helper to toggle from a serialized object
+        window.toggleBookmarkFromObject = function(q) {
+            toggleBookmark(q);
+        };
+
+        // -------------------------------------
+
         // Helper functions
         function updateTopics() {
             const chap = document.getElementById('chapter-select').value;
@@ -664,7 +743,8 @@
                 q: q.q || q.question || '',
                 correct: (q.correct !== undefined) ? q.correct : q.answer,
                 explanation: q.explanation || q.explain || '',
-                fileId: fileId
+                fileId: fileId,
+                uid: fileId + '_' + idx   // unique identifier for bookmark
             }));
         }
 
@@ -763,7 +843,7 @@
                     `).join('');
                     container.innerHTML += `
                         <div class="question-card">
-                            <p><strong>${i+1}. ${q.q}</strong></p>
+                            <p><strong>${i+1}. ${q.q}</strong> ${renderStarButton(q)}</p>
                             <div class="options-group">${optsHtml}</div>
                         </div>`;
                 });
@@ -824,7 +904,8 @@
             let q = questions[currentIndex];
             let ans = practiceAnswers[currentIndex];
             let searchBtnHtml = `<button class="btn btn-small" onclick="searchCurrentQuestion()">🔍</button>`;
-            document.getElementById('question-text').innerHTML = `${currentIndex+1}. ${q.q} ${searchBtnHtml}`;
+            let starHtml = renderStarButton(q);
+            document.getElementById('question-text').innerHTML = `${currentIndex+1}. ${q.q} ${searchBtnHtml} ${starHtml}`;
             let optsHtml = q.options.map((opt, idx) => {
                 let checked = (ans === idx) ? 'checked' : '';
                 return `<label id="opt-${idx}" class="option-label"><input type="radio" name="practice-opt" value="${idx}" ${checked} onchange="onPracticeAnswer(${idx})"> ${opt}</label>`;
@@ -864,6 +945,9 @@
             } else if (currentMode === 'psycho' && currentIndex > 0) {
                 currentIndex--;
                 renderFlashcardQuestion();
+            } else if (currentMode === 'bookmarkReview' && currentIndex > 0) {
+                currentIndex--;
+                renderPracticeQuestion(); // reuse practice rendering
             }
         };
 
@@ -873,6 +957,9 @@
                 renderPracticeQuestion();
             } else if (currentMode === 'psycho') {
                 nextFlashcard();
+            } else if (currentMode === 'bookmarkReview' && currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderPracticeQuestion();
             }
         };
 
@@ -906,7 +993,7 @@
                 }).join('');
 
                 reviewHtml += `<div class="question-card" style="border-left:12px solid ${isCorrect ? '#10b981' : '#ef4444'}">
-                    <p><strong>${i+1}. ${q.q}</strong> <button class="btn btn-small" onclick='searchQuestionFromReview("${q.q.replace(/"/g, '&quot;')}", ${JSON.stringify(q.options)})'>🔍</button></p>
+                    <p><strong>${i+1}. ${q.q}</strong> ${renderStarButton(q)} <button class="btn btn-small" onclick='searchQuestionFromReview("${q.q.replace(/"/g, '&quot;')}", ${JSON.stringify(q.options)})'>🔍</button></p>
                     ${optsHtml}
                     ${selected===null?'<p style="color:var(--danger);">⚠️ Skipped</p>':''}
                     <div class="explanation-box">💡 ${q.explanation}</div></div>`;
@@ -950,7 +1037,7 @@
                 }).join('');
 
                 reviewHtml += `<div class="question-card" style="border-left:12px solid ${isCorrect ? '#10b981' : '#ef4444'}">
-                    <p><strong>${i+1}. ${q.q}</strong> <button class="btn btn-small" onclick='searchQuestionFromReview("${q.q.replace(/"/g, '&quot;')}", ${JSON.stringify(q.options)})'>🔍</button></p>
+                    <p><strong>${i+1}. ${q.q}</strong> ${renderStarButton(q)} <button class="btn btn-small" onclick='searchQuestionFromReview("${q.q.replace(/"/g, '&quot;')}", ${JSON.stringify(q.options)})'>🔍</button></p>
                     ${optsHtml}
                     ${selected===null?'<p style="color:var(--danger);">⚠️ Skipped</p>':''}
                     <div class="explanation-box">💡 ${q.explanation}</div></div>`;
@@ -1059,7 +1146,8 @@
             let q = shownQuestions[currentIndex];
             let ans = shownAnswers[currentIndex];
             let searchBtnHtml = `<button class="btn btn-small" onclick="searchCurrentQuestion()">🔍</button>`;
-            document.getElementById('question-text').innerHTML = `${currentIndex+1}. ${q.q} ${searchBtnHtml}`;
+            let starHtml = renderStarButton(q);
+            document.getElementById('question-text').innerHTML = `${currentIndex+1}. ${q.q} ${searchBtnHtml} ${starHtml}`;
             let optsHtml = q.options.map((opt, idx) => {
                 let checked = (ans.selected === idx) ? 'checked' : '';
                 return `<label id="opt-${idx}" class="option-label"><input type="radio" name="flash-opt" value="${idx}" ${checked} onchange="onFlashcardAnswer(${idx})"> ${opt}</label>`;
@@ -1115,7 +1203,6 @@
             document.getElementById('streaming-status').innerText = `Pool: ${loadedQuestions.length}`;
         }
 
-        // 🛠️ FIX: added view switching and cleanup
         function submitPsychoResults() {
             let correct = 0, incorrect = 0, skipped = 0, reviewHtml = '';
             shownQuestions.forEach((q, i) => {
@@ -1138,14 +1225,13 @@
                 }).join('');
 
                 reviewHtml += `<div class="question-card" style="border-left:12px solid ${isCorrect ? '#10b981' : '#ef4444'}">
-                    <p><strong>${i+1}. ${q.q}</strong> <button class="btn btn-small" onclick='searchQuestionFromReview("${q.q.replace(/"/g, '&quot;')}", ${JSON.stringify(q.options)})'>🔍</button></p>
+                    <p><strong>${i+1}. ${q.q}</strong> ${renderStarButton(q)} <button class="btn btn-small" onclick='searchQuestionFromReview("${q.q.replace(/"/g, '&quot;')}", ${JSON.stringify(q.options)})'>🔍</button></p>
                     ${optsHtml}
                     ${selected===null?'<p style="color:var(--danger);">⚠️ Skipped</p>':''}
                     <div class="explanation-box">💡 ${q.explanation}</div></div>`;
             });
             displayResults(correct, incorrect, skipped, shownQuestions.length, reviewHtml, 'Psycho Flashcard', timeUsed);
 
-            // 🛠️ ADDED: end quiz and show results
             quizActive = false;
             clearInterval(timerInterval);
             document.getElementById('quiz-view').classList.add('hidden');
@@ -1195,6 +1281,39 @@
             startStandardQuiz('exam');
         }
 
+        // ---------- NEW: Bookmark Review ----------
+        function startBookmarkReview() {
+            loadBookmarks();
+            if (bookmarks.length === 0) {
+                alert('You have no bookmarked questions.');
+                return;
+            }
+            // Use a copy of the bookmarks array
+            questions = bookmarks.map(q => ({ ...q }));
+            practiceAnswers = new Array(questions.length).fill(null);
+            currentIndex = 0;
+            currentMode = 'bookmarkReview';
+            currentChapterName = 'Bookmarked Questions';
+
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+            document.getElementById('result-view').classList.add('hidden');
+            document.getElementById('flashcard-ui').classList.remove('hidden');
+            document.getElementById('standard-exam-ui').classList.add('hidden');
+            document.getElementById('mode-display').innerText = 'BOOKMARK REVIEW';
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('prevBtn').disabled = true;
+            document.getElementById('streaming-status').innerText = '';
+            quizActive = true;
+            startTime = Date.now();
+            timeUsed = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            renderPracticeQuestion(); // reuse practice render
+        }
+
+        // ----------------------------------------
+
         window.searchCurrentQuestion = function() {
             let questionText = '', options = [];
             if (currentMode === 'standardPractice' && questions[currentIndex]) {
@@ -1203,6 +1322,9 @@
             } else if (currentMode === 'psycho' && shownQuestions[currentIndex]) {
                 questionText = shownQuestions[currentIndex].q;
                 options = shownQuestions[currentIndex].options || [];
+            } else if (currentMode === 'bookmarkReview' && questions[currentIndex]) {
+                questionText = questions[currentIndex].q;
+                options = questions[currentIndex].options || [];
             } else return;
             let query = questionText + (options.length ? ' ' + options.join(' ') : '');
             window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
@@ -1218,6 +1340,7 @@
             if (currentMode === 'standardExam') calculateExamResults();
             else if (currentMode === 'standardPractice') finishPractice();
             else if (currentMode === 'psycho') submitPsychoResults();
+            else if (currentMode === 'bookmarkReview') finishPractice(); // same as practice
         };
 
         window.practiceWrong = function() {
@@ -1234,6 +1357,10 @@
                 wrongQs = shownQuestions.filter((q, i) => !isAnswerCorrect(shownAnswers[i]?.selected, q.correct));
                 wrongAnswers = new Array(wrongQs.length).fill(null);
                 sourceChapter = 'Psycho Flashcard';
+            } else if (currentMode === 'bookmarkReview') {
+                wrongQs = questions.filter((q, i) => !isAnswerCorrect(practiceAnswers[i], q.correct));
+                wrongAnswers = new Array(wrongQs.length).fill(null);
+                sourceChapter = 'Bookmarked Questions';
             } else return;
             if (!wrongQs.length) { alert('No wrong answers!'); return; }
             questions = wrongQs.map(q => ({...q}));
@@ -1287,6 +1414,7 @@
         window.onFlashcardAnswer = onFlashcardAnswer;
         window.nextFlashcard = nextFlashcard;
         window.resetStat = resetStat;
+        window.startBookmarkReview = startBookmarkReview;
 
         function displayHomeStats() {
             let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
@@ -1304,6 +1432,7 @@
         }
 
         // Initialize
+        loadBookmarks();
         updateTopics();
         buildChapterList();
         displayHomeStats();
