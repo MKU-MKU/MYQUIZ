@@ -581,7 +581,7 @@
 </script>
 
 <script>
-    // ========== EXISTING APP CODE (full features, unchanged) ==========
+    // ========== EXISTING APP CODE (full features, with FIX for Psycho Finish) ==========
     (function(){
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXQeUllkncM06aiI10OQIz0uwRVToDbJWIRJzxWNgsAEwnuWuyHjdP8P572nO8feBewA/exec";
 
@@ -1115,6 +1115,7 @@
             document.getElementById('streaming-status').innerText = `Pool: ${loadedQuestions.length}`;
         }
 
+        // 🛠️ FIX: added view switching and cleanup
         function submitPsychoResults() {
             let correct = 0, incorrect = 0, skipped = 0, reviewHtml = '';
             shownQuestions.forEach((q, i) => {
@@ -1143,6 +1144,12 @@
                     <div class="explanation-box">💡 ${q.explanation}</div></div>`;
             });
             displayResults(correct, incorrect, skipped, shownQuestions.length, reviewHtml, 'Psycho Flashcard', timeUsed);
+
+            // 🛠️ ADDED: end quiz and show results
+            quizActive = false;
+            clearInterval(timerInterval);
+            document.getElementById('quiz-view').classList.add('hidden');
+            document.getElementById('result-view').classList.remove('hidden');
         }
 
         async function startPsychoExam() {
