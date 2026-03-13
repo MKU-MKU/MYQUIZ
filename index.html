@@ -3,310 +3,698 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>HAMRO AFNAI · stats per chapter + reset</title>
+    <title>HAMRO AFNAI SATHI</title>
     <meta name="theme-color" content="#1e293b">
     <link rel="apple-touch-icon" href="#">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
     <style>
-        /* ========== ALL EXISTING STYLES (unchanged) ========== */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        /* ========== REFINED STYLES – SMOOTH, MODERN, RESPONSIVE ========== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         :root {
-            --primary: #1e293b; --accent: #3b82f6; --success: #10b981;
-            --danger: #ef4444; --warning: #f59e0b; --bg: #f8fafc; --card: #ffffff;
-            --text: #0f172a; --border: #e2e8f0;
+            --primary: #1e293b;
+            --primary-light: #334155;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --success-hover: #059669;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --radius-sm: 0.75rem;
+            --radius-md: 1.5rem;
+            --radius-lg: 2.5rem;
+            --transition: all 0.2s ease;
         }
+
         .dark-mode {
-            --primary: #94a3b8; --accent: #60a5fa; --success: #34d399;
-            --danger: #f87171; --warning: #fbbf24; --bg: #0f172a; --card: #1e293b;
-            --text: #f1f5f9; --border: #334155;
+            --primary: #94a3b8;
+            --primary-light: #64748b;
+            --accent: #60a5fa;
+            --accent-hover: #3b82f6;
+            --success: #34d399;
+            --success-hover: #10b981;
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --text-light: #94a3b8;
+            --border: #334155;
         }
+
         .dark-mode .option-correct {
             background: #1e3a2e !important;
             border-color: #34d399 !important;
             color: #e2ffe2 !important;
         }
+
         .dark-mode .option-incorrect {
             background: #4a1e1e !important;
             border-color: #f87171 !important;
             color: #ffe2e2 !important;
             text-decoration: line-through;
         }
+
         .dark-mode .explanation-box,
         .dark-mode .explanation-box * {
             color: #d4f7d4 !important;
             background-color: #2a3a2a !important;
             border-color: #2e4a2e !important;
         }
+
         .dark-mode div[style*="background:#dcfce7"] {
             background: #1e3a2e !important;
             color: #e2ffe2 !important;
             border-color: #34d399 !important;
         }
+
         .dark-mode div[style*="background:#fee2e2"] {
             background: #4a1e1e !important;
             color: #ffe2e2 !important;
             border-color: #f87171 !important;
         }
-        .dark-mode div[style*="border-left:12px solid #10b981"] {
-            border-left-color: #34d399 !important;
-        }
-        .dark-mode div[style*="border-left:12px solid #ef4444"] {
-            border-left-color: #f87171 !important;
-        }
+
         .dark-mode .question-card p,
         .dark-mode .options-group label {
             color: var(--text) !important;
         }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: var(--bg); color: var(--text); transition: 0.2s;
-            line-height: 1.5;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: var(--transition);
+            line-height: 1.6;
+            min-height: 100vh;
         }
-        .navbar {
-            background: var(--primary); color: white; padding: 1rem 2.5rem;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 200;
-        }
-        .navbar h2 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
-        .container { max-width: 1300px; margin: 2.5rem auto; padding: 0 2.5rem; }
-        
-        .hero-card {
-            background: var(--card); padding: 2.5rem; border-radius: 2.5rem;
-            box-shadow: 0 25px 30px -12px rgb(0 0 0 / 0.15);
-            border-top: 8px solid var(--accent);
-        }
-        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
-        .subhead { color: #64748b; margin-bottom: 2.5rem; font-size: 1.2rem; }
 
-        .home-section { margin-bottom: 2.5rem; }
+        .navbar {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            backdrop-filter: blur(10px);
+            background: rgba(30, 41, 59, 0.95);
+        }
+
+        .navbar h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .hero-card {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            border-top: 6px solid var(--accent);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subhead {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .home-section {
+            margin-bottom: 2rem;
+        }
+
         .section-card {
-            background: var(--bg); border-radius: 2rem; padding: 2rem;
-            border: 1px solid var(--border); transition: all 0.2s;
+            background: var(--bg);
+            border-radius: var(--radius-md);
+            padding: 1.75rem;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
         }
+
+        .section-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
         .section-title {
-            display: flex; align-items: center; gap: 0.75rem;
-            font-size: 1.4rem; font-weight: 600; margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text);
         }
+
         .section-title .badge {
-            background: var(--accent); color: white; padding: 0.4rem 1rem;
-            border-radius: 999px; font-size: 1rem; font-weight: 500;
+            background: var(--accent);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
 
         .chapter-panel {
-            background: var(--card); border-radius: 1.5rem; border: 1px solid var(--border);
-            padding: 1rem; margin: 2rem 0; max-height: 350px; overflow-y: auto;
+            background: var(--card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            margin: 1.5rem 0;
+            max-height: 350px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) var(--border);
         }
+
+        .chapter-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chapter-panel::-webkit-scrollbar-track {
+            background: var(--border);
+            border-radius: 8px;
+        }
+
+        .chapter-panel::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 8px;
+        }
+
         .chapter-item {
-            display: flex; align-items: center; padding: 1rem;
-            border-bottom: 1px solid var(--border); border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
         }
-        .chapter-item:hover { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+
+        .chapter-item:hover {
+            background: color-mix(in srgb, var(--accent) 8%, transparent);
+        }
+
         .chapter-item input[type="checkbox"] {
-            width: 1.4rem; height: 1.4rem; margin-right: 1.2rem;
-            accent-color: var(--accent); cursor: pointer;
+            width: 1.3rem;
+            height: 1.3rem;
+            margin-right: 1rem;
+            accent-color: var(--accent);
+            cursor: pointer;
         }
-        .chapter-info { flex: 1; }
+
+        .chapter-info {
+            flex: 1;
+        }
+
         .chapter-name {
-            font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 0.8rem;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
+
         .chapter-name .chapter-number {
-            background: var(--primary); color: white; width: 2.2rem; height: 2.2rem;
-            display: inline-flex; align-items: center; justify-content: center;
-            border-radius: 999px; font-size: 1rem; font-weight: 700;
+            background: var(--primary);
+            color: white;
+            width: 2rem;
+            height: 2rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 600;
         }
-        .topic-count { font-size: 0.9rem; color: #64748b; margin-left: 3rem; }
+
+        .topic-count {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-left: 2.5rem;
+        }
 
         .select-buttons {
-            display: flex; gap: 1.5rem; margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
+
         .select-buttons button {
-            flex: 1; background: var(--primary); border: none; padding: 1rem;
-            border-radius: 999px; font-weight: 600; color: white; cursor: pointer;
-            transition: 0.2s; font-size: 1rem;
+            flex: 1;
+            background: var(--primary-light);
+            border: none;
+            padding: 0.75rem;
+            border-radius: 999px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.95rem;
         }
-        .select-buttons button:hover { filter: brightness(1.1); transform: translateY(-3px); }
+
+        .select-buttons button:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
 
         .btn {
-            background: var(--accent); color: white; border: none; padding: 1rem 2rem;
-            border-radius: 999px; font-weight: 600; cursor: pointer; transition: 0.2s;
-            display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
             font-size: 1rem;
+            box-shadow: var(--shadow-sm);
         }
-        .btn:hover { filter: brightness(1.1); transform: translateY(-3px); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-success { background: var(--success); }
-        .btn-warning { background: var(--warning); }
-        .btn-psycho { background: #8b5cf6; }
-        .btn-block { width: 100%; }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-success:hover {
+            background: var(--success-hover);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: #0f172a;
+        }
+
+        .btn-warning:hover {
+            background: #eab308;
+        }
+
+        .btn-psycho {
+            background: #8b5cf6;
+        }
+
+        .btn-psycho:hover {
+            background: #7c3aed;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
         .btn-small {
             padding: 0.3rem 0.8rem;
-            font-size: 0.9rem;
-            margin-left: 0.5rem;
-            background: var(--primary);
+            font-size: 0.8rem;
+            background: var(--primary-light);
         }
-        /* Star button for bookmark */
+
         .btn-star {
             background: transparent;
             border: 2px solid var(--accent);
             color: var(--accent);
             font-size: 1.2rem;
-            padding: 0.3rem 0.6rem;
-            margin-left: 0.5rem;
+            padding: 0.2rem 0.5rem;
         }
+
         .btn-star.bookmarked {
             background: var(--accent);
             color: white;
         }
 
         #install-btn {
-            background: white; color: var(--primary); border: none;
-            padding: 0.5rem 1rem; border-radius: 999px; font-weight: 600;
-            margin-left: 0.5rem; cursor: pointer; display: none;
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            display: none;
+            transition: var(--transition);
         }
-        #install-btn.show { display: inline-block; }
+
+        #install-btn.show {
+            display: inline-block;
+        }
+
+        #install-btn:hover {
+            background: var(--bg);
+            transform: scale(1.05);
+        }
 
         .quiz-header {
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
-            background: var(--card); padding: 1.5rem 2rem; border-radius: 1.5rem; margin-bottom: 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: sticky; top: 90px; z-index: 150;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            background: var(--card);
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 80px;
+            z-index: 150;
+            backdrop-filter: blur(8px);
+            background: rgba(var(--card-rgb), 0.95);
         }
+
         .mode-badge {
-            background: var(--accent); color: white; padding: 0.5rem 1.5rem;
-            border-radius: 999px; font-size: 1rem; font-weight: 600;
+            background: var(--accent);
+            color: white;
+            padding: 0.4rem 1.2rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 600;
         }
+
         .timer {
-            font-weight: 700; font-size: 1.3rem; transition: color 0.3s;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: color 0.3s;
         }
-        .timer.warning { color: #f59e0b; }
-        .timer.danger { color: #ef4444; animation: pulse 1s infinite; }
+
+        .timer.warning {
+            color: var(--warning);
+        }
+
+        .timer.danger {
+            color: var(--danger);
+            animation: pulse 1s infinite;
+        }
 
         @keyframes pulse {
-            0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; }
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
         }
 
         .question-card {
-            background: var(--card); padding: 2.5rem; border-radius: 2rem; margin-bottom: 1.5rem;
-            border-left: 12px solid var(--accent); box-shadow: 0 15px 20px -8px rgba(0,0,0,0.1);
+            background: var(--card);
+            padding: 2rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+            border-left: 8px solid var(--accent);
+            box-shadow: var(--shadow-md);
         }
-        .question-card p { font-size: 1.3rem; margin-bottom: 1.5rem; }
+
+        .question-card p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
 
         .options-group label {
-            display: block; padding: 1.2rem; margin: 1rem 0; border-radius: 1.2rem;
-            background: var(--bg); border: 2px solid transparent; cursor: pointer;
-            transition: 0.1s; font-size: 1.1rem;
+            display: block;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            border-radius: var(--radius-sm);
+            background: var(--bg);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
         }
-        .options-group label:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
-        .options-group input[type="radio"] { margin-right: 1rem; width: 1.2rem; height: 1.2rem; }
 
-        .option-correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #166534; font-weight: 600; }
-        .option-incorrect { background: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b; text-decoration: line-through; }
+        .options-group label:hover {
+            background: color-mix(in srgb, var(--accent) 10%, transparent);
+            border-color: var(--accent);
+        }
+
+        .options-group input[type="radio"] {
+            margin-right: 1rem;
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: var(--accent);
+        }
+
+        .option-correct {
+            background: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #166534;
+            font-weight: 600;
+        }
+
+        .option-incorrect {
+            background: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b;
+            text-decoration: line-through;
+        }
 
         .explanation-box {
-            margin-top: 2rem; padding: 1.8rem; border-radius: 1.5rem;
-            background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534;
-            font-size: 1.1rem;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: var(--radius-sm);
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            font-size: 1rem;
         }
 
-        .progress { height: 12px; background: var(--border); border-radius: 999px; margin: 2rem 0; }
-        .progress-fill { height: 100%; background: var(--accent); border-radius: 999px; width: 0%; transition: width 0.3s; }
+        .progress {
+            height: 10px;
+            background: var(--border);
+            border-radius: 999px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            border-radius: 999px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
 
         .standard-exam .question-card {
-            padding: 2rem; border-left-width: 8px;
+            padding: 1.5rem;
+            border-left-width: 6px;
         }
 
-        .loading-more { font-size: 1rem; color: var(--accent); margin-top: 1rem; font-style: italic; }
+        .loading-more {
+            font-size: 0.95rem;
+            color: var(--accent);
+            margin-top: 1rem;
+            font-style: italic;
+            text-align: center;
+        }
 
-        #stats-home ul { list-style: none; padding-left: 0; font-size: 1.1rem; }
+        #stats-home ul {
+            list-style: none;
+            padding-left: 0;
+            font-size: 1rem;
+        }
+
         #stats-home li {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0.8rem 0; border-bottom: 1px dashed var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px dashed var(--border);
         }
-        .stat-info { flex: 1; }
+
+        .stat-info {
+            flex: 1;
+        }
+
         .reset-btn {
-            background: var(--danger); color: white; border: none;
-            padding: 0.4rem 1rem; border-radius: 999px; font-size: 0.9rem;
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
             cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .reset-btn:hover {
+            background: #dc2626;
+        }
+
+        .review-wrong-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .review-wrong-btn:hover {
+            background: var(--accent-hover);
         }
 
         .info-tip {
-            display: inline-block; background: var(--primary); color: white;
-            width: 1.6rem; height: 1.6rem; border-radius: 50%;
-            text-align: center; line-height: 1.6rem; font-size: 1rem;
-            cursor: help; margin-left: 0.5rem;
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 1.5rem;
+            font-size: 0.9rem;
+            cursor: help;
+            margin-left: 0.5rem;
         }
-        .hidden { display: none !important; }
-        footer { text-align: center; margin-top: 3rem; color: #64748b; font-size: 1rem; }
 
-        /* ===== MOBILE COMPACT LAYOUT (including sticky buttons) ===== */
+        .hidden {
+            display: none !important;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2.5rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .motivation {
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-size: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #loading:not(.hidden) {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+            color: var(--accent);
+            min-height: 200px;
+        }
+
+        #loading:not(.hidden)::after {
+            content: "";
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 600px) {
             .navbar {
                 padding: 0.5rem 1rem;
             }
             .navbar h2 {
-                font-size: 1rem;
-            }
-            .navbar button {
-                padding: 0.3rem 0.6rem;
-                font-size: 0.8rem;
-            }
-            #install-btn {
-                padding: 0.3rem 0.6rem;
-                font-size: 0.7rem;
-                margin-left: 0.3rem;
+                font-size: 1.2rem;
             }
             .container {
-                padding: 0 0.8rem;
+                padding: 0 0.75rem;
                 margin: 1rem auto;
             }
             .hero-card {
-                padding: 1.2rem;
+                padding: 1.5rem;
+                border-radius: 1.5rem;
             }
             h1 {
-                font-size: 1.5rem;
+                font-size: 1.8rem;
+            }
+            .section-card {
+                padding: 1.25rem;
+            }
+            .btn {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.95rem;
+            }
+            .btn-small {
+                padding: 0.2rem 0.5rem;
+                font-size: 0.7rem;
             }
             .quiz-header {
-                padding: 0.5rem;
-                gap: 0.3rem;
+                padding: 0.75rem;
                 top: 70px;
             }
             .mode-badge {
                 font-size: 0.8rem;
-                padding: 0.2rem 0.8rem;
+                padding: 0.3rem 0.8rem;
             }
             .timer {
                 font-size: 1rem;
-                margin-left: auto;
             }
-            .nav-buttons {
-                display: flex;
-                gap: 0.3rem;
-                width: auto;
-                flex: 1 1 auto;
-                justify-content: flex-end;
-            }
-            .nav-buttons .btn {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.8rem;
-                white-space: nowrap;
-            }
-            .btn {
-                padding: 0.6rem 1rem;
-            }
-            .btn-small {
-                padding: 0.2rem 0.5rem;
-                font-size: 0.75rem;
-            }
-            
-            /* ===== STICKY BUTTONS FIX FOR PRACTICE MODE ===== */
             #flashcard-ui {
                 display: flex;
                 flex-direction: column;
-                height: calc(100vh - 180px); /* Adjust based on header height */
+                height: calc(100vh - 160px);
             }
             #flashcard-ui .question-card {
                 flex: 1 1 auto;
                 overflow-y: auto;
                 margin-bottom: 0.5rem;
+                padding: 1.25rem;
             }
             #flashcard-ui > div:last-child {
                 flex-shrink: 0;
@@ -317,83 +705,72 @@
                 bottom: 0;
                 z-index: 10;
             }
-            /* Reduce extra gap */
-            #flashcard-ui > div[style*="margin: 2rem 0"] {
-                margin: 0 !important;
-            }
-            footer {
-                margin-top: 0.5rem !important;
-            }
-            /* Keep question card readable */
-            .question-card {
-                padding: 1.5rem;
-            }
             .question-card p {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
             }
             .options-group label {
                 padding: 0.8rem;
-                font-size: 1rem;
+                font-size: 0.95rem;
             }
             .explanation-box {
-                padding: 1.2rem;
-                font-size: 1rem;
-            }
-        }
-
-        @media (min-width: 601px) {
-            #flashcard-ui > div[style*="margin: 2rem 0"] {
-                margin: 2rem 0;
-            }
-            footer {
-                margin-top: 3rem;
+                padding: 1rem;
+                font-size: 0.95rem;
             }
         }
     </style>
 </head>
 <body>
 <nav class="navbar">
-    <h2>🧠 HAMRO AFNAI SATHI</h2>
+    <h2>🧠 HAMRO AFNAI · 5·7·GK + DAILY</h2>
     <div>
-        <button onclick="toggleTheme()" style="background:transparent; border:2px solid white; padding:0.4rem 0.8rem;">🌓</button>
+        <button onclick="toggleTheme()" style="background:transparent; border:2px solid white; padding:0.3rem 0.6rem; border-radius:999px; color:white;">🌓</button>
         <button id="install-btn" onclick="installPWA()">📲 Install App</button>
     </div>
 </nav>
 
 <div class="container">
-    <!-- HOME VIEW (unchanged) -->
+    <!-- HOME VIEW -->
     <div id="home-view">
         <div class="hero-card">
             <h1>SATHI Dashboard</h1>
-            <div class="subhead">Choose your mode – practice (one by one) or exam (all at once).</div>
+            <div class="subhead">Choose your level, then chapter and subtopic.</div>
 
-            <!-- Online section -->
+            <!-- Online section with level dropdown -->
             <div class="home-section">
                 <div class="section-card">
                     <div class="section-title">
                         <span class="badge">☁️</span> Online (Google Drive)
                     </div>
-                    <label style="font-weight:600;">Chapter</label>
-                    <select id="chapter-select" onchange="updateTopics()" style="padding:0.8rem; width:100%;">
-                        <option value="">-- Choose --</option>
-                        <option value="1">1. Structural Engineering</option>
-                        <option value="2">2. Engineering Survey</option>
-                        <option value="3">3. Construction Materials</option>
-                        <option value="4">4. Concrete Technology</option>
-                        <option value="5">5. Geotechnical Engineering</option>
-                        <option value="6">6. Construction Management</option>
-                        <option value="7">7. Estimating, Costing...</option>
-                        <option value="8">8. Engineering Drawing</option>
-                        <option value="9">9. Engineering Economics</option>
-                        <option value="10">10. Professional Practices</option>
-                        <option value="11">11. General Knowledge</option>
+                    <label style="font-weight:600;">Level</label>
+                    <select id="level-select" onchange="updateChapters()" style="padding:0.8rem; width:100%; margin-bottom:1rem; border-radius:999px; border:1px solid var(--border); background:var(--card); color:var(--text);">
+                        <option value="">-- Choose Level --</option>
+                        <option value="level5">Level 5 (placeholders)</option>
+                        <option value="level7">Level 7</option>
+                        <option value="gk">General Knowledge</option>
                     </select>
+
+                    <label style="font-weight:600;">Chapter</label>
+                    <select id="chapter-select" onchange="updateTopics()" disabled style="padding:0.8rem; width:100%; margin-bottom:1rem; border-radius:999px; border:1px solid var(--border); background:var(--card); color:var(--text);"></select>
+
                     <label style="font-weight:600; margin-top:1rem;">Subtopic</label>
-                    <select id="topic-select" disabled style="padding:0.8rem; width:100%;"></select>
+                    <select id="topic-select" disabled style="padding:0.8rem; width:100%; border-radius:999px; border:1px solid var(--border); background:var(--card); color:var(--text);"></select>
+
                     <div style="display:flex; gap:1rem; margin-top:1.5rem;">
                         <button class="btn" onclick="fetchAndStart('practice')" style="flex:1;">🏋️ Practice</button>
                         <button class="btn btn-warning" onclick="fetchAndStart('exam')" style="flex:1;">📝 Exam</button>
                     </div>
+                </div>
+            </div>
+
+            <!-- DAILY CHALLENGE SECTION -->
+            <div class="home-section">
+                <div class="section-card">
+                    <div class="section-title">
+                        <span class="badge">📅</span> Aajka Sawal (Daily 20)
+                    </div>
+                    <p style="margin-bottom:1rem;">Fresh 20 random questions every day. Same set for everyone – loads instantly!</p>
+                    <button class="btn btn-block" onclick="startDailyChallenge()" style="background:#f97316;">🌟 Start Daily Challenge</button>
+                    <div id="daily-progress" class="loading-more"></div>
                 </div>
             </div>
 
@@ -403,7 +780,7 @@
                     <div class="section-title">
                         <span class="badge">📂</span> Local File
                     </div>
-                    <input type="file" id="local-file-input" accept=".json" style="padding:0.5rem; width:100%;">
+                    <input type="file" id="local-file-input" accept=".json" style="padding:0.5rem; width:100%; border-radius:999px; border:1px solid var(--border); background:var(--card); color:var(--text);">
                     <div style="display:flex; gap:1rem; margin-top:1.5rem;">
                         <button class="btn btn-success" onclick="loadLocalFile('practice')" style="flex:1;">🏋️ Practice</button>
                         <button class="btn btn-warning" onclick="loadLocalFile('exam')" style="flex:1;">📝 Exam</button>
@@ -417,7 +794,7 @@
                     <div class="section-title">
                         <span class="badge">🧠</span> Psycho Flashcard
                     </div>
-                    <p style="margin-bottom:1rem;">Select chapters – all subtopics mixed, one by one with feedback.</p>
+                    <p style="margin-bottom:1rem;">Select chapters across levels – all subtopics mixed.</p>
                     <div class="select-buttons">
                         <button type="button" onclick="selectAllChapters()">✅ Select All</button>
                         <button type="button" onclick="deselectAllChapters()">❌ Clear All</button>
@@ -435,7 +812,7 @@
                 </div>
             </div>
 
-            <!-- NEW: BOOKMARK REVIEW SECTION -->
+            <!-- BOOKMARK REVIEW -->
             <div class="home-section">
                 <div class="section-card">
                     <div class="section-title">
@@ -453,7 +830,7 @@
                 <div class="section-card">
                     <div class="section-title">
                         <span class="badge">📊</span> Your Statistics
-                        <span class="info-tip" title="Edit DRIVE_FILES to add topics">?</span>
+                        <span class="info-tip" title="Click Review Wrong to practice only incorrect questions from that chapter">?</span>
                     </div>
                     <div id="stats-home">Loading...</div>
                 </div>
@@ -464,7 +841,7 @@
     <!-- LOADING -->
     <div id="loading" class="hidden">⏳ Loading questions...</div>
 
-    <!-- QUIZ VIEW (unchanged) -->
+    <!-- QUIZ VIEW -->
     <div id="quiz-view" class="hidden">
         <div class="quiz-header">
             <span class="mode-badge" id="mode-display">Mode</span>
@@ -478,6 +855,7 @@
         <!-- Flashcard UI -->
         <div id="flashcard-ui" class="flashcard-ui hidden">
             <div class="progress"><div id="progress-fill" class="progress-fill"></div></div>
+            <div id="motivation-message" class="motivation hidden"></div>
             <div id="question-card" class="question-card">
                 <p id="question-text" style="font-weight:600; margin-bottom:1rem;"></p>
                 <div id="options-container" class="options-group"></div>
@@ -497,7 +875,7 @@
         </div>
     </div>
 
-    <!-- RESULT VIEW (unchanged) -->
+    <!-- RESULT VIEW -->
     <div id="result-view" class="hidden">
         <div class="hero-card">
             <h2 id="final-score" style="font-size:2.5rem; text-align:center;"></h2>
@@ -514,45 +892,32 @@
             <div id="review-container" style="margin-top:1.5rem;"></div>
         </div>
     </div>
-    <footer>practice · exam · wrong · stats per chapter · bookmarks</footer>
+    <footer>levels · chapters · daily challenge · bookmarks · stats</footer>
 </div>
 
 <script>
-    // ========== PWA SETUP WITH CUSTOM NAME AND ICON ==========
+    // ========== PWA SETUP ==========
     (function() {
-        // Your custom icon URL (same for both sizes – browser will scale it)
         const iconUrl = 'https://i.imgur.com/lCc9SUi.png';
-
         const manifest = {
             name: 'HAMRO AFNAI',
-            short_name: 'SATHI',          // displayed under the icon
-            description: 'Your quiz app with custom branding',
+            short_name: 'SATHI',
+            description: 'Your quiz app with levels 5,7,GK + daily challenge',
             start_url: '.',
             display: 'standalone',
             theme_color: '#1e293b',
             background_color: '#ffffff',
             icons: [
-                {
-                    src: iconUrl,
-                    sizes: '192x192',
-                    type: 'image/png'
-                },
-                {
-                    src: iconUrl,
-                    sizes: '512x512',
-                    type: 'image/png'
-                }
+                { src: iconUrl, sizes: '192x192', type: 'image/png' },
+                { src: iconUrl, sizes: '512x512', type: 'image/png' }
             ]
         };
-
-        // Create manifest as data URL (most compatible)
         const manifestData = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(manifest));
         const link = document.createElement('link');
         link.rel = 'manifest';
         link.href = manifestData;
         document.head.appendChild(link);
 
-        // Service Worker (optional, for offline caching)
         if ('serviceWorker' in navigator) {
             const swCode = `
                 const CACHE_NAME = 'mohits-cache-v1';
@@ -573,7 +938,6 @@
             navigator.serviceWorker.register(swUrl).catch(err => console.warn('SW failed:', err));
         }
 
-        // Install button logic
         let deferredPrompt;
         const installBtn = document.getElementById('install-btn');
         if (window.matchMedia('(display-mode: standalone)').matches) {
@@ -607,37 +971,148 @@
 </script>
 
 <script>
-    // ========== EXISTING APP CODE (full features, with BOOKMARK feature added) ==========
+    // ========== 🖊️ EDITABLE CONFIGURATION – LEVELS, CHAPTERS, SUBTOPICS ==========
     (function(){
+        // ----- 1. LEVELS (add or remove levels here) -----
+        const LEVELS = {
+            "level5": { display: "Level 5 (placeholders)" },
+            "level7": { display: "Level 7" },
+            "gk":     { display: "General Knowledge" }
+        };
+
+        // ----- 2. CHAPTER NAMES – now defined per level -----
+        const CHAPTER_NAMES_BY_LEVEL = {
+            "level5": {
+                "1": "L5 - Structural Engineering",
+                "2": "L5 - Engineering Survey",
+                "3": "L5 - Construction Materials",
+                "4": "L5 - Concrete Technology",
+                "5": "L5 - Geotechnical Engineering",
+                "6": "L5 - Construction Management",
+                "7": "L5 - Estimating, Costing...",
+                "8": "L5 - Engineering Drawing",
+                "9": "L5 - Engineering Economics",
+                "10": "L5 - Professional Practices"
+            },
+            "level7": {
+                "1": "Structural Engineering",
+                "2": "Engineering Survey",
+                "3": "Construction Materials",
+                "4": "Concrete Technology",
+                "5": "Geotechnical Engineering",
+                "6": "Construction Management",
+                "7": "Estimating, Costing...",
+                "8": "Engineering Drawing",
+                "9": "Engineering Economics",
+                "10": "Professional Practices"
+            },
+            "gk": {
+                "11": "General Knowledge"
+            }
+        };
+
+        // ----- 3. SUBTOPICS FOR EACH CHAPTER (per level) -----
+
+        // Level 5 placeholders
+        const LEVEL5_DATA = {
+            "1": { "Topic A1": "", "Topic A2": "", "Topic A3": "" },
+            "2": { "Topic B1": "", "Topic B2": "", "Topic B3": "" },
+            "3": { "Topic C1": "", "Topic C2": "", "Topic C3": "" },
+            "4": { "Topic D1": "", "Topic D2": "", "Topic D3": "" },
+            "5": { "Topic E1": "", "Topic E2": "", "Topic E3": "" },
+            "6": { "Topic F1": "", "Topic F2": "", "Topic F3": "" },
+            "7": { "Topic G1": "", "Topic G2": "", "Topic G3": "" },
+            "8": { "Topic H1": "", "Topic H2": "", "Topic H3": "" },
+            "9": { "Topic I1": "", "Topic I2": "", "Topic I3": "" },
+            "10": { "Topic J1": "", "Topic J2": "", "Topic J3": "" }
+        };
+
+        // Level 7 full data
+        const LEVEL7_DATA = {
+            "1": {
+                "DPARSAD 1-70":   "1JKTr9KDUJwTaDPxP95RAfGQ9A2Rq8bc1",
+                "DPARSAD 71-140": "1YS2oqmeoqMXk45sew_9sKRC9L2Nrzqfd",
+                "DPARSAD 141-228": "1qtiqWIC2oVF-WyoKgE7NGIRb3jcy8l4z"
+            },
+            "2": {
+                "DPARSAD 1-100":   "1hrZUgxFdyLjRisUW8hqjk_91XPHW6fkk",
+                "DPARSAD 101-175": "1bJfeJWKRSzdh8m52Gn6TQBHNDr_EI1L1",
+                "DPARSAD 175-250": "1EJbIVPxccC2fEuTFe3h3kv4piG3HkCFA",
+                "DPARSAD 250-350": "1OeUBA5_sVwodrOof_p-iaMbIULaG2uZi",
+                "DPARSAD 350-455": "1QpcCAqfxJqxeDomO-xyraFIhYkmvdq7y"
+            },
+            "3": {
+                "DPARSAD 1-100":   "1z1BD4dJBsa30yVPeLRKdum9QZRUo0CzS",
+                "DPARSAD 101-175": "1xXcFMVIymWnuTOJF-nh9SSJzuXNQYfWr",
+                "DPARSAD 176-255": "1FNH_P_VklmCofiliFzmgtwHG16NsYxru",
+                "DPARSAD 256-350": "1H8XGO0r1s0jFfa02s9fclckJFh6GQXfZ",
+                "DPARSAD 350-477": "1s_K_DQUEUM3zQc1eIId1N5QwnSI9i1yr"
+            },
+            "4": {
+                "DPARSAD 1-75":   "1ivhJrueZC3QLpFQeFYm0yJWffSGNe-Pe",
+                "DPARSAD 76-150": "1lE_4WajJhn5Inr6fru65lVZFWL0DuKjL",
+                "DPARSAD 151-225": "13hbb-93x6zM-j1yhSGNhGNVPKhkP2geZ",
+                "DPARSAD 225-300": "1Ul0uc_61O6yRUyTdQX7aQAPQJl2myXER",
+                "DPARSAD 301-403": "187r8DH0nIj4OrrAteXdlbcoqIlE4Y09f"
+            },
+            "5": { "DPARSAD": "1ipRrpTWBA7JIdwCuTY73ZZwY0CTM-LAP" },
+            "6": {
+                "DPARSAD 1-75":   "1cQGpQHGzekcDnE2duOkYzx3NAoeuPv5h",
+                "DPARSAD 76-150": "1T2tghXwm_6Dqy5FkQgs0wiRrhl0NQuGM",
+                "DPARSAD 151-225": "1tro7AirSkoOm9zYvJyQo5W_hlUvoqvlg",
+                "DPARSAD 225-310": "12jhiq9Jbp3EwvqJgW_bxyPq77IYfUEAa"
+            },
+            "7": {
+                "DPARSAD 1-50":   "1NFxxLQyK9xMAgPgxGGlOJUTxYdWj2n91",
+                "DPARSAD 51-100": "1PFaqOODmbzhnnfg73XF-76DxoVs3BXo-",
+                "DPARSAD 101-150": "1zZt_I7co6SW8cqsZII61PIkVruKACVG9",
+                "DPARSAD 151-200": "1Cw1Ynpl_HZwYnql_COr6tOjZPVGyixM1",
+                "DPARSAD 201-250": "1v8e52YEiCGMuCFsixyYO6KMOBqSjelLc"
+            },
+            "8": {
+                "DPARSAD 1-100":   "1sYFk5E4Tt6FHt6quXOUXlrYBj5KsnwCk",
+                "DPARSAD 101-183": "1Ku_xi4rfTFvGUCYFa10l5X5afWLE59qc"
+            },
+            "9": {
+                "DPARSAD 1-75":   "1q1A_kumq-JieVTi-_bXE8k2SVMpfJoxF",
+                "DPARSAD 75-129": "18TMf8id1Yz6p2EjNONb8bIgf4AkG2fC0"
+            },
+            "10": { "DPARSAD 1-113": "1V5JicjEQWiQy-UprrRfM_YJgXOQNwWgX" }
+        };
+
+        // General Knowledge (chapter 11)
+        const GK_DATA = {
+            "11": {
+                "1. Periodic Plans":          "",
+                "2. Sustainable Dev":         "",
+                "3. International Affairs":   "",
+                "4. Constitution":            "",
+                "5. Governance":              "",
+                "6. Civil Service":           "1JJxacB5GWl6tPJupqpwh98s5V7EngJLw",
+                "7. Public Services":         "1jecxHKbXsiW6IIXdVKakp8tDhQ5IOQKt",
+                "8. Charter":                 "1sFSSB4hnSPgqiFxAWD1vF4Gkgm8FyKz5",
+                "9. Public Policy":           "",
+                "10. Management":             "",
+                "11. Planning & Accounting":  "1ZIbu4pcNLDw-N_kGEUtdNVtJqxNX0c_T"
+            }
+        };
+
+        const DRIVE_FILES_BY_LEVEL = {
+            "level5": LEVEL5_DATA,
+            "level7": LEVEL7_DATA,
+            "gk": GK_DATA
+        };
+
+        const LEVEL_DISPLAY = {
+            "level5": LEVELS["level5"].display,
+            "level7": LEVELS["level7"].display,
+            "gk": LEVELS["gk"].display
+        };
+
+        // ========== END OF EDITABLE CONFIGURATION ==========
+        // ========== REST OF THE APP CODE ==========
+
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXQeUllkncM06aiI10OQIz0uwRVToDbJWIRJzxWNgsAEwnuWuyHjdP8P572nO8feBewA/exec";
-
-        const DRIVE_FILES = {
-            "1":{"DPARSAD 1-70":"1JKTr9KDUJwTaDPxP95RAfGQ9A2Rq8bc1","DPARSAD 71-140":"1YS2oqmeoqMXk45sew_9sKRC9L2Nrzqfd","DPARSAD 141-228":"1qtiqWIC2oVF-WyoKgE7NGIRb3jcy8l4z","RK":"",},
-            "2":{"DPARSAD 1-100":"1hrZUgxFdyLjRisUW8hqjk_91XPHW6fkk","DPARSAD 101-175":"1bJfeJWKRSzdh8m52Gn6TQBHNDr_EI1L1","DPARSAD 175-250":"1EJbIVPxccC2fEuTFe3h3kv4piG3HkCFA","DPARSAD 250-350":"1OeUBA5_sVwodrOof_p-iaMbIULaG2uZi","DPARSAD 350-455":"1QpcCAqfxJqxeDomO-xyraFIhYkmvdq7y"},
-            "3":{"DPARSAD 1-100":"1z1BD4dJBsa30yVPeLRKdum9QZRUo0CzS","DPARSAD 101-175":"1xXcFMVIymWnuTOJF-nh9SSJzuXNQYfWr","DPARSAD 176-255":"1FNH_P_VklmCofiliFzmgtwHG16NsYxru","DPARSAD 256-350":"1H8XGO0r1s0jFfa02s9fclckJFh6GQXfZ","DPARSAD 350-477":"1s_K_DQUEUM3zQc1eIId1N5QwnSI9i1yr"},
-            "4":{"DPARSAD 1-75":"1ivhJrueZC3QLpFQeFYm0yJWffSGNe-Pe","DPARSAD 76-150":"1lE_4WajJhn5Inr6fru65lVZFWL0DuKjL","DPARSAD 151-225":"13hbb-93x6zM-j1yhSGNhGNVPKhkP2geZ","DPARSAD 225-300":"1Ul0uc_61O6yRUyTdQX7aQAPQJl2myXER","DPARSAD 301-403":"187r8DH0nIj4OrrAteXdlbcoqIlE4Y09f"},
-            "5":{"DPARSAD ":"1ipRrpTWBA7JIdwCuTY73ZZwY0CTM-LAP"},
-            "6":{"DPARSAD 1-75":"1cQGpQHGzekcDnE2duOkYzx3NAoeuPv5h","DPARSAD 76-150":"1T2tghXwm_6Dqy5FkQgs0wiRrhl0NQuGM","DPARSAD 151-225":"1tro7AirSkoOm9zYvJyQo5W_hlUvoqvlg","DPARSAD 225-310":"12jhiq9Jbp3EwvqJgW_bxyPq77IYfUEAa"},
-            "7":{"DPARSAD 1-50":"1NFxxLQyK9xMAgPgxGGlOJUTxYdWj2n91","DPARSAD 51-100":"1PFaqOODmbzhnnfg73XF-76DxoVs3BXo-","DPARSAD 101-150":"1zZt_I7co6SW8cqsZII61PIkVruKACVG9","DPARSAD 151-200":"1Cw1Ynpl_HZwYnql_COr6tOjZPVGyixM1","DPARSAD 201-250":"1v8e52YEiCGMuCFsixyYO6KMOBqSjelLc"},
-            "8":{"DPARSAD 1-100":"1sYFk5E4Tt6FHt6quXOUXlrYBj5KsnwCk","DPARSAD 101-183":"1Ku_xi4rfTFvGUCYFa10l5X5afWLE59qc"},
-            "9":{"DPARSAD 1-75":"1q1A_kumq-JieVTi-_bXE8k2SVMpfJoxF","DPARSAD 75-129":"18TMf8id1Yz6p2EjNONb8bIgf4AkG2fC0"},
-            "10":{"DPARSAD 1-113":"1V5JicjEQWiQy-UprrRfM_YJgXOQNwWgX"},
-            "11":{"1. Periodic Plans":"","2. Sustainable Dev":"","3. International Affairs":"","4. Constitution":"","5. Governance":"","6. Civil Service":"1JJxacB5GWl6tPJupqpwh98s5V7EngJLw","7. Public Services":"1jecxHKbXsiW6IIXdVKakp8tDhQ5IOQKt","8. Charter":"1sFSSB4hnSPgqiFxAWD1vF4Gkgm8FyKz5","9. Public Policy":"","10. Management":"","11. Planning & Accounting":"1ZIbu4pcNLDw-N_kGEUtdNVtJqxNX0c_T"}
-        };
-
-        const CHAPTER_NAMES = {
-            "1": "Structural Engineering",
-            "2": "Engineering Survey",
-            "3": "Construction Materials",
-            "4": "Concrete Technology",
-            "5": "Geotechnical Engineering",
-            "6": "Construction Management",
-            "7": "Estimating, Costing...",
-            "8": "Engineering Drawing",
-            "9": "Engineering Economics",
-            "10": "Professional Practices",
-            "11": "General Knowledge"
-        };
 
         // GLOBAL STATE
         let questions = [];
@@ -661,8 +1136,8 @@
         let shownQuestions = [];
         let shownAnswers = [];
 
-        // ---------- BOOKMARK FEATURE ----------
-        let bookmarks = []; // array of full question objects
+        let wrongQuestionsByChapter = JSON.parse(localStorage.getItem('wrongQuestionsByChapter') || '{}');
+        let bookmarks = [];
 
         function loadBookmarks() {
             try {
@@ -681,13 +1156,11 @@
             if (!question.uid) return;
             const idx = bookmarks.findIndex(b => b.uid === question.uid);
             if (idx === -1) {
-                // Add a copy to avoid reference issues
                 bookmarks.push({ ...question });
             } else {
                 bookmarks.splice(idx, 1);
             }
             saveBookmarks();
-            // Update star button if it exists
             const starBtn = document.getElementById('star-btn-' + question.uid);
             if (starBtn) {
                 if (idx === -1) {
@@ -699,34 +1172,68 @@
                 }
             }
         }
-
-        // Call this to get the HTML for the star button
         function renderStarButton(question) {
             const uid = question.uid;
             const bookmarked = isBookmarked(uid);
             return `<button id="star-btn-${uid}" class="btn btn-star ${bookmarked ? 'bookmarked' : ''}" onclick="window.toggleBookmarkFromObject(${JSON.stringify(question).replace(/"/g, '&quot;')})">${bookmarked ? '★' : '☆'}</button>`;
         }
-
-        // Helper to toggle from a serialized object
         window.toggleBookmarkFromObject = function(q) {
             toggleBookmark(q);
         };
 
-        // -------------------------------------
+        function getChapterName(level, chapNum) {
+            if (CHAPTER_NAMES_BY_LEVEL[level] && CHAPTER_NAMES_BY_LEVEL[level][chapNum]) {
+                return CHAPTER_NAMES_BY_LEVEL[level][chapNum];
+            }
+            return `Chapter ${chapNum}`;
+        }
 
-        // Helper functions
-        function updateTopics() {
-            const chap = document.getElementById('chapter-select').value;
+        function updateChapters() {
+            const level = document.getElementById('level-select').value;
+            const chapterSel = document.getElementById('chapter-select');
             const topicSel = document.getElementById('topic-select');
             topicSel.innerHTML = '<option value="">-- Choose Subtopic --</option>';
-            if (DRIVE_FILES[chap]) {
-                topicSel.disabled = false;
-                for (let t in DRIVE_FILES[chap]) {
-                    let opt = new Option(t, DRIVE_FILES[chap][t]);
-                    if (!DRIVE_FILES[chap][t]) opt.disabled = true;
-                    topicSel.add(opt);
-                }
-            } else topicSel.disabled = true;
+            topicSel.disabled = true;
+
+            if (!level || !DRIVE_FILES_BY_LEVEL[level]) {
+                chapterSel.innerHTML = '<option value="">-- Choose Chapter --</option>';
+                chapterSel.disabled = true;
+                return;
+            }
+
+            const chapters = DRIVE_FILES_BY_LEVEL[level];
+            let options = '<option value="">-- Choose Chapter --</option>';
+            for (let chapNum in chapters) {
+                let chapName = getChapterName(level, chapNum);
+                options += `<option value="${chapNum}">${chapNum}. ${chapName}</option>`;
+            }
+            chapterSel.innerHTML = options;
+            chapterSel.disabled = false;
+        }
+
+        function updateTopics() {
+            const level = document.getElementById('level-select').value;
+            const chapNum = document.getElementById('chapter-select').value;
+            const topicSel = document.getElementById('topic-select');
+            topicSel.innerHTML = '<option value="">-- Choose Subtopic --</option>';
+            if (!level || !chapNum || !DRIVE_FILES_BY_LEVEL[level] || !DRIVE_FILES_BY_LEVEL[level][chapNum]) {
+                topicSel.disabled = true;
+                return;
+            }
+            const subtopics = DRIVE_FILES_BY_LEVEL[level][chapNum];
+            const hasValid = Object.values(subtopics).some(fid => fid && fid.trim() !== '');
+            if (!hasValid) {
+                topicSel.innerHTML = '<option value="" disabled selected>🚧 No questions yet (coming soon)</option>';
+                topicSel.disabled = true;
+                return;
+            }
+            topicSel.disabled = false;
+            for (let subtopic in subtopics) {
+                let fid = subtopics[subtopic];
+                let opt = new Option(subtopic, fid);
+                if (!fid || !fid.trim()) opt.disabled = true;
+                topicSel.add(opt);
+            }
         }
 
         function isAnswerCorrect(selected, correct) {
@@ -744,47 +1251,57 @@
                 correct: (q.correct !== undefined) ? q.correct : q.answer,
                 explanation: q.explanation || q.explain || '',
                 fileId: fileId,
-                uid: fileId + '_' + idx   // unique identifier for bookmark
+                uid: fileId + '_' + idx
             }));
         }
 
         function buildChapterList() {
             const container = document.getElementById('chapter-list');
             container.innerHTML = '';
-            for (let i = 1; i <= 11; i++) {
-                let chapNum = i.toString();
-                let chapName = CHAPTER_NAMES[chapNum];
-                let subtopics = DRIVE_FILES[chapNum] || {};
-                let validCount = Object.values(subtopics).filter(v => v && v.trim() !== '').length;
-                const div = document.createElement('div');
-                div.className = 'chapter-item';
-                div.innerHTML = `
-                    <input type="checkbox" id="chap-${chapNum}" value="${chapNum}" checked>
-                    <div class="chapter-info">
-                        <div class="chapter-name">
-                            <span class="chapter-number">${chapNum}</span>
-                            ${chapName}
+
+            for (let levelKey of ['level5', 'level7', 'gk']) {
+                const levelName = LEVEL_DISPLAY[levelKey];
+                const levelChapters = DRIVE_FILES_BY_LEVEL[levelKey] || {};
+
+                const heading = document.createElement('div');
+                heading.style = 'font-weight:bold; font-size:1.2rem; margin:1rem 0 0.5rem 0; color:var(--accent);';
+                heading.innerText = levelName;
+                container.appendChild(heading);
+
+                for (let chapNum in levelChapters) {
+                    let chapName = getChapterName(levelKey, chapNum);
+                    let subtopics = levelChapters[chapNum];
+                    let validCount = Object.values(subtopics).filter(v => v && v.trim() !== '').length;
+                    const div = document.createElement('div');
+                    div.className = 'chapter-item';
+                    div.innerHTML = `
+                        <input type="checkbox" id="chap-${levelKey}-${chapNum}" value="${levelKey}|${chapNum}" ${validCount === 0 ? 'disabled' : 'checked'}>
+                        <div class="chapter-info">
+                            <div class="chapter-name">
+                                <span class="chapter-number">${chapNum}</span>
+                                ${chapName}
+                            </div>
+                            <div class="topic-count">${validCount} subtopics</div>
                         </div>
-                        <div class="topic-count">${validCount} subtopics</div>
-                    </div>
-                `;
-                container.appendChild(div);
+                    `;
+                    container.appendChild(div);
+                }
             }
         }
 
         window.selectAllChapters = function() {
-            document.querySelectorAll('#chapter-list input[type="checkbox"]').forEach(cb => cb.checked = true);
+            document.querySelectorAll('#chapter-list input[type="checkbox"]:not(:disabled)').forEach(cb => cb.checked = true);
         };
         window.deselectAllChapters = function() {
-            document.querySelectorAll('#chapter-list input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.querySelectorAll('#chapter-list input[type="checkbox"]:not(:disabled)').forEach(cb => cb.checked = false);
         };
 
         async function fetchAndStart(selectedMode) {
+            const level = document.getElementById('level-select').value;
+            const chapNum = document.getElementById('chapter-select').value;
             const fileId = document.getElementById('topic-select').value;
-            if (!fileId) return alert('Select a subtopic');
-            const chapterValue = document.getElementById('chapter-select').value;
-            if (!chapterValue) { alert('Select a chapter first.'); return; }
-            currentChapterName = CHAPTER_NAMES[chapterValue] || "Unknown Chapter";
+            if (!level || !chapNum || !fileId) return alert('Select level, chapter and subtopic');
+            currentChapterName = LEVEL_DISPLAY[level] + ' - ' + getChapterName(level, chapNum);
 
             document.getElementById('home-view').classList.add('hidden');
             document.getElementById('loading').classList.remove('hidden');
@@ -900,6 +1417,18 @@
             }
         }
 
+        const motivationalMessages = [
+            "Great job! 🎉", "Keep going! 💪", "You're on fire! 🔥", "Excellent! ✨",
+            "Correct! 👍", "Nice one! 🌟", "You've got this! 🚀", "Awesome! 🏆"
+        ];
+
+        function showMotivation() {
+            const msgDiv = document.getElementById('motivation-message');
+            msgDiv.innerText = motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
+            msgDiv.classList.remove('hidden');
+            setTimeout(() => msgDiv.classList.add('hidden'), 2000);
+        }
+
         function renderPracticeQuestion() {
             let q = questions[currentIndex];
             let ans = practiceAnswers[currentIndex];
@@ -936,6 +1465,7 @@
             document.getElementById('nextBtn').disabled = currentIndex === questions.length - 1;
             let answered = practiceAnswers.filter(a => a !== null).length;
             document.getElementById('progress-fill').style.width = (answered / questions.length * 100) + '%';
+            if (isAnswerCorrect(selectedIdx, correctIdx)) showMotivation();
         };
 
         window.prevQuestion = function() {
@@ -947,7 +1477,10 @@
                 renderFlashcardQuestion();
             } else if (currentMode === 'bookmarkReview' && currentIndex > 0) {
                 currentIndex--;
-                renderPracticeQuestion(); // reuse practice rendering
+                renderPracticeQuestion();
+            } else if (currentMode === 'dailyChallenge' && currentIndex > 0) {
+                currentIndex--;
+                renderPracticeQuestion();
             }
         };
 
@@ -958,6 +1491,9 @@
             } else if (currentMode === 'psycho') {
                 nextFlashcard();
             } else if (currentMode === 'bookmarkReview' && currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderPracticeQuestion();
+            } else if (currentMode === 'dailyChallenge' && currentIndex < questions.length - 1) {
                 currentIndex++;
                 renderPracticeQuestion();
             }
@@ -1001,6 +1537,8 @@
 
             let timeTaken = totalExamTime - timeRemaining;
             displayResults(correct, incorrect, skipped, questions.length, reviewHtml, currentChapterName, timeTaken);
+            saveWrongQuestions(currentChapterName);
+            if (correct === questions.length) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         };
 
         function finishPractice() {
@@ -1044,6 +1582,8 @@
             });
 
             displayResults(correct, incorrect, skipped, questions.length, reviewHtml, currentChapterName, timeUsed);
+            saveWrongQuestions(currentChapterName);
+            if (correct === questions.length) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         }
 
         function displayResults(correct, incorrect, skipped, total, reviewHtml, topicName, timeSpent) {
@@ -1063,14 +1603,28 @@
             displayHomeStats();
         }
 
-        // Psycho flashcard
+        function saveWrongQuestions(topicName) {
+            let wrong = [];
+            questions.forEach((q, i) => {
+                let selected = (currentMode === 'standardExam') ? userAnswers[i] : practiceAnswers[i];
+                if (selected !== null && !isAnswerCorrect(selected, q.correct)) {
+                    wrong.push(q);
+                }
+            });
+            if (wrong.length > 0) {
+                wrongQuestionsByChapter[topicName] = wrong;
+                localStorage.setItem('wrongQuestionsByChapter', JSON.stringify(wrongQuestionsByChapter));
+            }
+        }
+
         async function startPsychoFlashcard() {
-            const checkboxes = document.querySelectorAll('#chapter-list input[type="checkbox"]:checked');
-            const selectedChaps = Array.from(checkboxes).map(cb => cb.value);
-            if (!selectedChaps.length) return alert('Select at least one chapter');
+            const checkboxes = document.querySelectorAll('#chapter-list input[type="checkbox"]:checked:not(:disabled)');
+            const selected = Array.from(checkboxes).map(cb => cb.value);
+            if (!selected.length) return alert('Select at least one chapter with questions');
             let fileIds = [];
-            for (let chap of selectedChaps) {
-                let subtopics = DRIVE_FILES[chap] || {};
+            for (let val of selected) {
+                let [levelKey, chapNum] = val.split('|');
+                let subtopics = DRIVE_FILES_BY_LEVEL[levelKey]?.[chapNum] || {};
                 for (let fid of Object.values(subtopics)) if (fid && fid.trim()) fileIds.push(fid);
             }
             if (!fileIds.length) return alert('No valid file IDs');
@@ -1177,6 +1731,7 @@
             let answeredCount = shownAnswers.filter(a => a.selected !== null).length;
             document.getElementById('progress-fill').style.width = (answeredCount / shownQuestions.length * 100) + '%';
             maybeFetchNextFile();
+            if (isAnswerCorrect(selectedIdx, correctIdx)) showMotivation();
         };
 
         async function nextFlashcard() {
@@ -1231,6 +1786,8 @@
                     <div class="explanation-box">💡 ${q.explanation}</div></div>`;
             });
             displayResults(correct, incorrect, skipped, shownQuestions.length, reviewHtml, 'Psycho Flashcard', timeUsed);
+            saveWrongQuestions('Psycho Flashcard');
+            if (correct === shownQuestions.length) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
 
             quizActive = false;
             clearInterval(timerInterval);
@@ -1239,12 +1796,13 @@
         }
 
         async function startPsychoExam() {
-            const checkboxes = document.querySelectorAll('#chapter-list input[type="checkbox"]:checked');
-            const selectedChaps = Array.from(checkboxes).map(cb => cb.value);
-            if (!selectedChaps.length) return alert('Select at least one chapter');
+            const checkboxes = document.querySelectorAll('#chapter-list input[type="checkbox"]:checked:not(:disabled)');
+            const selected = Array.from(checkboxes).map(cb => cb.value);
+            if (!selected.length) return alert('Select at least one chapter with questions');
             let fileIds = [];
-            for (let chap of selectedChaps) {
-                let subtopics = DRIVE_FILES[chap] || {};
+            for (let val of selected) {
+                let [levelKey, chapNum] = val.split('|');
+                let subtopics = DRIVE_FILES_BY_LEVEL[levelKey]?.[chapNum] || {};
                 for (let fid of Object.values(subtopics)) if (fid && fid.trim()) fileIds.push(fid);
             }
             if (!fileIds.length) return alert('No valid file IDs');
@@ -1281,14 +1839,12 @@
             startStandardQuiz('exam');
         }
 
-        // ---------- NEW: Bookmark Review ----------
         function startBookmarkReview() {
             loadBookmarks();
             if (bookmarks.length === 0) {
                 alert('You have no bookmarked questions.');
                 return;
             }
-            // Use a copy of the bookmarks array
             questions = bookmarks.map(q => ({ ...q }));
             practiceAnswers = new Array(questions.length).fill(null);
             currentIndex = 0;
@@ -1309,10 +1865,168 @@
             timeUsed = 0;
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(updateTimer, 1000);
-            renderPracticeQuestion(); // reuse practice render
+            renderPracticeQuestion();
         }
 
-        // ----------------------------------------
+        // ========== DAILY CHALLENGE – PRE‑GENERATED AND STORED ==========
+
+        // Generate today's set and store in localStorage
+        async function generateDailySet() {
+            const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+            const stored = localStorage.getItem('dailySet');
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (parsed.date === today && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
+                        return; // already have today's set
+                    }
+                } catch (e) {}
+            }
+
+            // Need to generate
+            let allFileIds = [];
+            for (let level of ['level7', 'gk']) {
+                let chapters = DRIVE_FILES_BY_LEVEL[level];
+                for (let chap in chapters) {
+                    for (let fid of Object.values(chapters[chap])) {
+                        if (fid && fid.trim()) allFileIds.push(fid);
+                    }
+                }
+            }
+            if (allFileIds.length === 0) return;
+
+            const seed = parseInt(today.split('-').join(''), 10);
+            const rng = mulberry32(seed);
+            const shuffled = shuffleArraySeeded(allFileIds, rng);
+            const selectedFileIds = shuffled.slice(0, 20);
+
+            let dailyQuestions = [];
+            for (let fid of selectedFileIds) {
+                try {
+                    let res = await fetch(`${APPS_SCRIPT_URL}?id=${fid}`);
+                    if (res.ok) {
+                        let qs = await res.json();
+                        let normalized = normalizeQuestions(qs, fid);
+                        if (normalized.length > 0) {
+                            let idx = Math.floor(rng() * normalized.length);
+                            dailyQuestions.push(normalized[idx]);
+                        }
+                    }
+                } catch (e) { console.warn('Failed', fid); }
+            }
+            if (dailyQuestions.length > 0) {
+                localStorage.setItem('dailySet', JSON.stringify({
+                    date: today,
+                    questions: dailyQuestions
+                }));
+            }
+        }
+
+        // Start daily challenge using stored set (if available)
+        async function startDailyChallenge() {
+            const today = new Date().toISOString().slice(0, 10);
+            const stored = localStorage.getItem('dailySet');
+            let dailyQuestions = null;
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (parsed.date === today && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
+                        dailyQuestions = parsed.questions;
+                    }
+                } catch (e) {}
+            }
+
+            if (!dailyQuestions) {
+                // If not available, generate now (user will wait)
+                document.getElementById('daily-progress').innerText = 'Generating today\'s set, please wait...';
+                await generateDailySet();
+                const newStored = localStorage.getItem('dailySet');
+                if (newStored) {
+                    try {
+                        dailyQuestions = JSON.parse(newStored).questions;
+                    } catch (e) {}
+                }
+                document.getElementById('daily-progress').innerText = '';
+            }
+
+            if (!dailyQuestions || dailyQuestions.length === 0) {
+                alert('Failed to load daily questions. Please try again later.');
+                return;
+            }
+
+            questions = dailyQuestions.map(q => ({ ...q })); // copy to avoid reference issues
+            practiceAnswers = new Array(questions.length).fill(null);
+            currentIndex = 0;
+            currentMode = 'dailyChallenge';
+            currentChapterName = 'Aajka Sawal (Daily 20)';
+
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+            document.getElementById('result-view').classList.add('hidden');
+            document.getElementById('flashcard-ui').classList.remove('hidden');
+            document.getElementById('standard-exam-ui').classList.add('hidden');
+            document.getElementById('mode-display').innerText = 'DAILY CHALLENGE';
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('prevBtn').disabled = true;
+            document.getElementById('streaming-status').innerText = '';
+            quizActive = true;
+            startTime = Date.now();
+            timeUsed = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            renderPracticeQuestion();
+        }
+
+        // Call generateDailySet in background after app loads
+        setTimeout(() => {
+            generateDailySet().catch(e => console.warn('Daily generation error', e));
+        }, 1000);
+
+        function mulberry32(a) {
+            return function() {
+                a |= 0; a = a + 0x6D2B79F5 | 0;
+                let t = Math.imul(a ^ a >>> 15, 1 | a);
+                t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+                return ((t ^ t >>> 14) >>> 0) / 4294967296;
+            };
+        }
+
+        function shuffleArraySeeded(arr, rng) {
+            let a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(rng() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        window.reviewWrongChapter = function(topicName) {
+            let wrong = wrongQuestionsByChapter[topicName];
+            if (!wrong || wrong.length === 0) {
+                alert('No wrong answers recorded for this chapter yet. Complete a quiz first!');
+                return;
+            }
+            questions = wrong.map(q => ({...q}));
+            practiceAnswers = new Array(questions.length).fill(null);
+            currentIndex = 0;
+            currentMode = 'standardPractice';
+            currentChapterName = topicName + ' (wrong)';
+
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+            document.getElementById('result-view').classList.add('hidden');
+            document.getElementById('flashcard-ui').classList.remove('hidden');
+            document.getElementById('standard-exam-ui').classList.add('hidden');
+            document.getElementById('mode-display').innerText = 'PRACTICE (wrong)';
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('prevBtn').disabled = true;
+            quizActive = true;
+            startTime = Date.now();
+            timeUsed = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            renderPracticeQuestion();
+        };
 
         window.searchCurrentQuestion = function() {
             let questionText = '', options = [];
@@ -1323,6 +2037,9 @@
                 questionText = shownQuestions[currentIndex].q;
                 options = shownQuestions[currentIndex].options || [];
             } else if (currentMode === 'bookmarkReview' && questions[currentIndex]) {
+                questionText = questions[currentIndex].q;
+                options = questions[currentIndex].options || [];
+            } else if (currentMode === 'dailyChallenge' && questions[currentIndex]) {
                 questionText = questions[currentIndex].q;
                 options = questions[currentIndex].options || [];
             } else return;
@@ -1340,7 +2057,8 @@
             if (currentMode === 'standardExam') calculateExamResults();
             else if (currentMode === 'standardPractice') finishPractice();
             else if (currentMode === 'psycho') submitPsychoResults();
-            else if (currentMode === 'bookmarkReview') finishPractice(); // same as practice
+            else if (currentMode === 'bookmarkReview') finishPractice();
+            else if (currentMode === 'dailyChallenge') finishPractice();
         };
 
         window.practiceWrong = function() {
@@ -1361,6 +2079,10 @@
                 wrongQs = questions.filter((q, i) => !isAnswerCorrect(practiceAnswers[i], q.correct));
                 wrongAnswers = new Array(wrongQs.length).fill(null);
                 sourceChapter = 'Bookmarked Questions';
+            } else if (currentMode === 'dailyChallenge') {
+                wrongQs = questions.filter((q, i) => !isAnswerCorrect(practiceAnswers[i], q.correct));
+                wrongAnswers = new Array(wrongQs.length).fill(null);
+                sourceChapter = 'Daily Challenge';
             } else return;
             if (!wrongQs.length) { alert('No wrong answers!'); return; }
             questions = wrongQs.map(q => ({...q}));
@@ -1401,6 +2123,7 @@
 
         window.toggleTheme = function() { document.body.classList.toggle('dark-mode'); };
         window.confirmQuit = function() { if (confirm('Quit quiz?')) location.reload(); };
+        window.updateChapters = updateChapters;
         window.updateTopics = updateTopics;
         window.fetchAndStart = fetchAndStart;
         window.loadLocalFile = loadLocalFile;
@@ -1415,6 +2138,7 @@
         window.nextFlashcard = nextFlashcard;
         window.resetStat = resetStat;
         window.startBookmarkReview = startBookmarkReview;
+        window.startDailyChallenge = startDailyChallenge;
 
         function displayHomeStats() {
             let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
@@ -1424,6 +2148,7 @@
                 let acc = s.total ? ((s.correct/s.total)*100).toFixed(1) : 0;
                 html += `<li>
                     <span class="stat-info"><strong>${topic}</strong>: ${s.correct}/${s.total} (${acc}%) – ${s.time}s</span>
+                    <button class="review-wrong-btn" onclick="reviewWrongChapter('${topic.replace(/'/g, "\\'")}')">📘 Review Wrong</button>
                     <button class="reset-btn" onclick="resetStat('${topic.replace(/'/g, "\\'")}')">Reset</button>
                 </li>`;
             }
@@ -1433,7 +2158,7 @@
 
         // Initialize
         loadBookmarks();
-        updateTopics();
+        updateChapters();
         buildChapterList();
         displayHomeStats();
     })();
