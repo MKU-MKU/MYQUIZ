@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>HAMRO AFNAI SATHI</title>
+    <title>HAMRO AFNAI · levels 5,7,GK + daily + per‑level select</title>
     <meta name="theme-color" content="#1e293b">
     <link rel="apple-touch-icon" href="#">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
@@ -721,7 +721,7 @@
 </head>
 <body>
 <nav class="navbar">
-    <h2>🧠 HAMRO AFNAI · 5·7·GK + DAILY</h2>
+    <h2>🧠 HAMRO AFNAI · 5·7·GK + DAILY + PER‑LEVEL SELECT</h2>
     <div>
         <button onclick="toggleTheme()" style="background:transparent; border:2px solid white; padding:0.3rem 0.6rem; border-radius:999px; color:white;">🌓</button>
         <button id="install-btn" onclick="installPWA()">📲 Install App</button>
@@ -788,7 +788,7 @@
                 </div>
             </div>
 
-            <!-- PSYCHO FLASHCARD -->
+            <!-- PSYCHO FLASHCARD with per‑level select buttons -->
             <div class="home-section">
                 <div class="section-card">
                     <div class="section-title">
@@ -1255,6 +1255,16 @@
             }));
         }
 
+        // Per‑level select functions
+        window.selectLevel = function(levelKey) {
+            const checkboxes = document.querySelectorAll(`#chapter-list input[type="checkbox"][id^="chap-${levelKey}-"]:not(:disabled)`);
+            checkboxes.forEach(cb => cb.checked = true);
+        };
+        window.deselectLevel = function(levelKey) {
+            const checkboxes = document.querySelectorAll(`#chapter-list input[type="checkbox"][id^="chap-${levelKey}-"]:not(:disabled)`);
+            checkboxes.forEach(cb => cb.checked = false);
+        };
+
         function buildChapterList() {
             const container = document.getElementById('chapter-list');
             container.innerHTML = '';
@@ -1263,10 +1273,29 @@
                 const levelName = LEVEL_DISPLAY[levelKey];
                 const levelChapters = DRIVE_FILES_BY_LEVEL[levelKey] || {};
 
-                const heading = document.createElement('div');
-                heading.style = 'font-weight:bold; font-size:1.2rem; margin:1rem 0 0.5rem 0; color:var(--accent);';
-                heading.innerText = levelName;
-                container.appendChild(heading);
+                // Level heading with select/deselect buttons
+                const headingDiv = document.createElement('div');
+                headingDiv.style = 'display: flex; align-items: center; justify-content: space-between; margin: 1rem 0 0.5rem 0;';
+                const titleSpan = document.createElement('span');
+                titleSpan.style = 'font-weight:bold; font-size:1.2rem; color:var(--accent);';
+                titleSpan.innerText = levelName;
+                headingDiv.appendChild(titleSpan);
+
+                const btnGroup = document.createElement('div');
+                btnGroup.style = 'display: flex; gap: 0.5rem;';
+                const selectBtn = document.createElement('button');
+                selectBtn.className = 'btn-small';
+                selectBtn.innerText = '✅ Select';
+                selectBtn.onclick = (e) => { e.stopPropagation(); selectLevel(levelKey); };
+                const deselectBtn = document.createElement('button');
+                deselectBtn.className = 'btn-small';
+                deselectBtn.innerText = '❌ Deselect';
+                deselectBtn.onclick = (e) => { e.stopPropagation(); deselectLevel(levelKey); };
+                btnGroup.appendChild(selectBtn);
+                btnGroup.appendChild(deselectBtn);
+                headingDiv.appendChild(btnGroup);
+
+                container.appendChild(headingDiv);
 
                 for (let chapNum in levelChapters) {
                     let chapName = getChapterName(levelKey, chapNum);
@@ -1870,7 +1899,6 @@
 
         // ========== DAILY CHALLENGE – PRE‑GENERATED AND STORED ==========
 
-        // Generate today's set and store in localStorage
         async function generateDailySet() {
             const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
             const stored = localStorage.getItem('dailySet');
@@ -1883,7 +1911,6 @@
                 } catch (e) {}
             }
 
-            // Need to generate
             let allFileIds = [];
             for (let level of ['level7', 'gk']) {
                 let chapters = DRIVE_FILES_BY_LEVEL[level];
@@ -1922,7 +1949,6 @@
             }
         }
 
-        // Start daily challenge using stored set (if available)
         async function startDailyChallenge() {
             const today = new Date().toISOString().slice(0, 10);
             const stored = localStorage.getItem('dailySet');
@@ -1937,7 +1963,6 @@
             }
 
             if (!dailyQuestions) {
-                // If not available, generate now (user will wait)
                 document.getElementById('daily-progress').innerText = 'Generating today\'s set, please wait...';
                 await generateDailySet();
                 const newStored = localStorage.getItem('dailySet');
@@ -1954,7 +1979,7 @@
                 return;
             }
 
-            questions = dailyQuestions.map(q => ({ ...q })); // copy to avoid reference issues
+            questions = dailyQuestions.map(q => ({ ...q }));
             practiceAnswers = new Array(questions.length).fill(null);
             currentIndex = 0;
             currentMode = 'dailyChallenge';
@@ -1977,7 +2002,6 @@
             renderPracticeQuestion();
         }
 
-        // Call generateDailySet in background after app loads
         setTimeout(() => {
             generateDailySet().catch(e => console.warn('Daily generation error', e));
         }, 1000);
