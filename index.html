@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>HAMRO AFNAI SATHI </title>
+    <title>HAMRO AFNAI SATHI – Study Pro</title>
     <meta name="theme-color" content="#1e293b">
     <link rel="apple-touch-icon" href="#">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
     <style>
-        /* ========== REFINED STYLES – SMOOTH, MODERN, RESPONSIVE ========== */
+        /* ========== REFINED STYLES – FULLY RESPONSIVE ========== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -84,11 +84,6 @@
             background: #4a1e1e !important;
             color: #ffe2e2 !important;
             border-color: #f87171 !important;
-        }
-
-        .dark-mode .question-card p,
-        .dark-mode .options-group label {
-            color: var(--text) !important;
         }
 
         body {
@@ -358,16 +353,23 @@
             background: var(--primary-light);
         }
 
-        .btn-star {
+        .btn-star, .btn-flag {
             background: transparent;
             border: 2px solid var(--accent);
             color: var(--accent);
             font-size: 1.2rem;
             padding: 0.2rem 0.5rem;
+            margin-left: 0.25rem;
         }
 
         .btn-star.bookmarked {
             background: var(--accent);
+            color: white;
+        }
+
+        .btn-flag.flagged {
+            background: #f97316;
+            border-color: #f97316;
             color: white;
         }
 
@@ -386,11 +388,6 @@
 
         #install-btn.show {
             display: inline-block;
-        }
-
-        #install-btn:hover {
-            background: var(--bg);
-            transform: scale(1.05);
         }
 
         .quiz-header {
@@ -518,9 +515,11 @@
             transition: width 0.3s ease;
         }
 
-        .standard-exam .question-card {
-            padding: 1.5rem;
-            border-left-width: 6px;
+        .counter-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
         }
 
         .loading-more {
@@ -605,22 +604,6 @@
             font-size: 0.9rem;
         }
 
-        .motivation {
-            background: var(--accent);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 999px;
-            font-size: 1rem;
-            text-align: center;
-            margin-top: 1rem;
-            animation: fadeIn 0.5s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         #loading:not(.hidden) {
             display: flex;
             align-items: center;
@@ -646,85 +629,28 @@
         }
 
         @media (max-width: 600px) {
-            .navbar {
-                padding: 0.5rem 1rem;
-            }
-            .navbar h2 {
-                font-size: 1.2rem;
-            }
-            .container {
-                padding: 0 0.75rem;
-                margin: 1rem auto;
-            }
-            .hero-card {
-                padding: 1.5rem;
-                border-radius: 1.5rem;
-            }
-            h1 {
-                font-size: 1.8rem;
-            }
-            .section-card {
-                padding: 1.25rem;
-            }
-            .btn {
-                padding: 0.7rem 1.2rem;
-                font-size: 0.95rem;
-            }
-            .btn-small {
-                padding: 0.2rem 0.5rem;
-                font-size: 0.7rem;
-            }
-            .quiz-header {
-                padding: 0.75rem;
-                top: 70px;
-            }
-            .mode-badge {
-                font-size: 0.8rem;
-                padding: 0.3rem 0.8rem;
-            }
-            .timer {
-                font-size: 1rem;
-            }
-            #flashcard-ui {
-                display: flex;
-                flex-direction: column;
-                height: calc(100vh - 160px);
-            }
-            #flashcard-ui .question-card {
-                flex: 1 1 auto;
-                overflow-y: auto;
-                margin-bottom: 0.5rem;
-                padding: 1.25rem;
-            }
-            #flashcard-ui > div:last-child {
-                flex-shrink: 0;
-                background: var(--bg);
-                padding: 0.5rem 0;
-                border-top: 1px solid var(--border);
-                position: sticky;
-                bottom: 0;
-                z-index: 10;
-            }
-            .question-card p {
-                font-size: 1.1rem;
-            }
-            .options-group label {
-                padding: 0.8rem;
-                font-size: 0.95rem;
-            }
-            .explanation-box {
-                padding: 1rem;
-                font-size: 0.95rem;
-            }
+            .navbar { padding: 0.5rem 1rem; }
+            .navbar h2 { font-size: 1.2rem; }
+            .container { padding: 0 0.75rem; margin: 1rem auto; }
+            .hero-card { padding: 1.5rem; border-radius: 1.5rem; }
+            h1 { font-size: 1.8rem; }
+            .section-card { padding: 1.25rem; }
+            .btn { padding: 0.7rem 1.2rem; font-size: 0.95rem; }
+            .quiz-header { padding: 0.75rem; top: 70px; }
+            .mode-badge { font-size: 0.8rem; padding: 0.3rem 0.8rem; }
+            .timer { font-size: 1rem; }
+            .question-card p { font-size: 1.1rem; }
+            .options-group label { padding: 0.8rem; font-size: 0.95rem; }
+            .explanation-box { padding: 1rem; font-size: 0.95rem; }
         }
     </style>
 </head>
 <body>
 <nav class="navbar">
-    <h2>🧠 HAMRO AFNAI SATHI </h2>
+    <h2>🧠 HAMRO AFNAI SATHI</h2>
     <div>
-        <button onclick="toggleTheme()" style="background:transparent; border:2px solid white; padding:0.3rem 0.6rem; border-radius:999px; color:white;">🌓</button>
-        <button id="install-btn" onclick="installPWA()">📲 Install App</button>
+        <button onclick="toggleTheme()" aria-label="Toggle dark mode" style="background:transparent; border:2px solid white; padding:0.3rem 0.6rem; border-radius:999px; color:white;">🌓</button>
+        <button id="install-btn">📲 Install App</button>
     </div>
 </nav>
 
@@ -733,14 +659,12 @@
     <div id="home-view">
         <div class="hero-card">
             <h1>SATHI Dashboard</h1>
-            <div class="subhead">Choose your level, then chapter and subtopic.</div>
+            <div class="subhead">Choose your study mode below.</div>
 
-            <!-- Online section with level dropdown -->
+            <!-- 1. ONLINE (manual selection) -->
             <div class="home-section">
                 <div class="section-card">
-                    <div class="section-title">
-                        <span class="badge">☁️</span> Online (Google Drive)
-                    </div>
+                    <div class="section-title"><span class="badge">☁️</span> Online (Google Drive)</div>
                     <label style="font-weight:600;">Level</label>
                     <select id="level-select" onchange="updateChapters()" style="padding:0.8rem; width:100%; margin-bottom:1rem; border-radius:999px; border:1px solid var(--border); background:var(--card); color:var(--text);">
                         <option value="">-- Choose Level --</option>
@@ -748,13 +672,10 @@
                         <option value="level7">Level 7</option>
                         <option value="gk">General Knowledge</option>
                     </select>
-
                     <label style="font-weight:600;">Chapter</label>
-                    <select id="chapter-select" onchange="updateTopics()" disabled style="padding:0.8rem; width:100%; margin-bottom:1rem; border-radius:999px; border:1px solid var(--border); background:var(--card); color:var(--text);"></select>
-
-                    <label style="font-weight:600; margin-top:1rem;">Subtopic</label>
-                    <select id="topic-select" disabled style="padding:0.8rem; width:100%; border-radius:999px; border:1px solid var(--border); background:var(--card); color:var(--text);"></select>
-
+                    <select id="chapter-select" onchange="updateTopics()" disabled style="padding:0.8rem; width:100%; margin-bottom:1rem; border-radius:999px;"></select>
+                    <label style="font-weight:600;">Subtopic</label>
+                    <select id="topic-select" disabled style="padding:0.8rem; width:100%; border-radius:999px;"></select>
                     <div style="display:flex; gap:1rem; margin-top:1.5rem;">
                         <button class="btn" onclick="fetchAndStart('practice')" style="flex:1;">🏋️ Practice</button>
                         <button class="btn btn-warning" onclick="fetchAndStart('exam')" style="flex:1;">📝 Exam</button>
@@ -762,77 +683,74 @@
                 </div>
             </div>
 
-            <!-- DAILY CHALLENGE SECTION -->
+            <!-- 2. DAILY CHALLENGE -->
             <div class="home-section">
                 <div class="section-card">
-                    <div class="section-title">
-                        <span class="badge">📅</span> Aajka Sawal
-                    </div>
-                    <p style="margin-bottom:1rem;">Fresh 20 random questions every day. Same set for everyone – loads instantly!</p>
+                    <div class="section-title"><span class="badge">📅</span> Daily Challenge</div>
+                    <p>20 fresh questions every day.</p>
                     <button class="btn btn-block" onclick="startDailyChallenge()" style="background:#f97316;">🌟 Start Daily Challenge</button>
                     <div id="daily-progress" class="loading-more"></div>
                 </div>
             </div>
 
-            <!-- Offline section -->
+            <!-- 3. PSYCHO FLASHCARD -->
             <div class="home-section">
                 <div class="section-card">
-                    <div class="section-title">
-                        <span class="badge">📂</span> Local File
-                    </div>
-                    <input type="file" id="local-file-input" accept=".json" style="padding:0.5rem; width:100%; border-radius:999px; border:1px solid var(--border); background:var(--card); color:var(--text);">
-                    <div style="display:flex; gap:1rem; margin-top:1.5rem;">
-                        <button class="btn btn-success" onclick="loadLocalFile('practice')" style="flex:1;">🏋️ Practice</button>
-                        <button class="btn btn-warning" onclick="loadLocalFile('exam')" style="flex:1;">📝 Exam</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PSYCHO FLASHCARD with per‑level select buttons -->
-            <div class="home-section">
-                <div class="section-card">
-                    <div class="section-title">
-                        <span class="badge">🧠</span> Psycho Flashcard
-                    </div>
-                    <p style="margin-bottom:1rem;">Select chapters across levels – all subtopics mixed.</p>
+                    <div class="section-title"><span class="badge">🧠</span> Psycho Flashcard</div>
+                    <p>Mix chapters from any level.</p>
                     <div class="select-buttons">
                         <button type="button" onclick="selectAllChapters()">✅ Select All</button>
                         <button type="button" onclick="deselectAllChapters()">❌ Clear All</button>
                     </div>
-                    <div id="chapter-list" class="chapter-panel">
-                        <p style="color:var(--text); padding:1rem;">Loading chapters...</p>
-                    </div>
-                    <button class="btn btn-psycho btn-block" onclick="startPsychoFlashcard()" id="psychoBtn" style="margin-top:1rem;">
-                        ⚡ Start Psycho Flashcard
-                    </button>
-                    <button class="btn btn-warning btn-block" onclick="startPsychoExam()" style="margin-top:0.5rem;" id="psychoExamBtn">
-                        📝 Psycho Exam (100 random)
-                    </button>
+                    <div id="chapter-list" class="chapter-panel"><p>Loading chapters...</p></div>
+                    <button class="btn btn-psycho btn-block" onclick="startPsychoFlashcard()" id="psychoBtn">⚡ Start Psycho Flashcard</button>
                     <div id="psychoProgress" class="loading-more"></div>
+                    <button class="btn btn-warning btn-block" onclick="startPsychoExam()" id="psychoExamBtn">📝 Psycho Exam (100 random)</button>
                 </div>
             </div>
 
-            <!-- BOOKMARK REVIEW -->
-            <div class="home-section">
-                <div class="section-card">
+            <!-- 4. BOOKMARKS & 5. FLAGGED side by side (with JSON export) -->
+            <div class="home-section" style="display: flex; gap: 1rem;">
+                <div class="section-card" style="flex: 1;">
                     <div class="section-title">
-                        <span class="badge">📌</span> Your Bookmarks
+                        <span class="badge">📌</span> Bookmarks
+                        <button class="btn btn-small" onclick="exportBookmarksJSON()" style="margin-left:auto;" title="Export as JSON">📤</button>
                     </div>
-                    <p style="margin-bottom:1rem;">Review only the questions you have starred (★).</p>
-                    <button class="btn btn-block" onclick="startBookmarkReview()" style="background:#8b5cf6;">
-                        ⭐ Review Bookmarks
-                    </button>
+                    <button class="btn btn-block" onclick="startBookmarkReview()" style="background:#8b5cf6;">⭐ Review Bookmarks</button>
+                </div>
+                <div class="section-card" style="flex: 1;">
+                    <div class="section-title">
+                        <span class="badge">🚩</span> Flagged
+                        <button class="btn btn-small" onclick="exportFlaggedJSON()" style="margin-left:auto;" title="Export as JSON">📤</button>
+                    </div>
+                    <button class="btn btn-block" onclick="startFlaggedReview()" style="background:#f97316;">🚩 Review Flagged</button>
                 </div>
             </div>
 
-            <!-- Statistics -->
+            <!-- 6. STATISTICS with Export/Import -->
             <div class="home-section">
                 <div class="section-card">
                     <div class="section-title">
                         <span class="badge">📊</span> Your Statistics
-                        <span class="info-tip" title="Click Review Wrong to practice only incorrect questions from that chapter">?</span>
+                        <span class="info-tip" title="Click Review Wrong to practice incorrect questions from that chapter">?</span>
                     </div>
                     <div id="stats-home">Loading...</div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button class="btn btn-small" onclick="exportData()">📤 Export</button>
+                        <button class="btn btn-small" onclick="importData()">📥 Import</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. LOCAL FILE (offline) -->
+            <div class="home-section">
+                <div class="section-card">
+                    <div class="section-title"><span class="badge">📂</span> Local File</div>
+                    <input type="file" id="local-file-input" accept=".json" style="padding:0.5rem; width:100%; border-radius:999px; border:1px solid var(--border); background:var(--card); color:var(--text);">
+                    <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                        <button class="btn btn-success" onclick="loadLocalFile('practice')" style="flex:1;">🏋️ Practice (local)</button>
+                        <button class="btn btn-warning" onclick="loadLocalFile('exam')" style="flex:1;">📝 Exam (local)</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -852,10 +770,13 @@
             </div>
         </div>
 
-        <!-- Flashcard UI -->
+        <!-- Flashcard UI (used for practice, psycho, bookmark, flagged, daily) -->
         <div id="flashcard-ui" class="flashcard-ui hidden">
+            <div class="counter-row">
+                <span id="correct-counter">✅ 0</span>
+                <span id="incorrect-counter">❌ 0</span>
+            </div>
             <div class="progress"><div id="progress-fill" class="progress-fill"></div></div>
-            <div id="motivation-message" class="motivation hidden"></div>
             <div id="question-card" class="question-card">
                 <p id="question-text" style="font-weight:600; margin-bottom:1rem;"></p>
                 <div id="options-container" class="options-group"></div>
@@ -868,7 +789,7 @@
             <div id="streaming-status" class="loading-more"></div>
         </div>
 
-        <!-- Standard Exam UI -->
+        <!-- Standard Exam UI (all questions at once) -->
         <div id="standard-exam-ui" class="standard-exam hidden">
             <div id="questions-container"></div>
             <button class="btn btn-block" onclick="calculateExamResults()" style="background:var(--success); padding:1rem;">Submit All Answers</button>
@@ -892,7 +813,7 @@
             <div id="review-container" style="margin-top:1.5rem;"></div>
         </div>
     </div>
-    <footer>levels · chapters · daily challenge · bookmarks · stats</footer>
+    <footer>study smart · track mistakes · master your knowledge</footer>
 </div>
 
 <script>
@@ -902,7 +823,7 @@
         const manifest = {
             name: 'HAMRO AFNAI',
             short_name: 'SATHI',
-            description: 'Your quiz app with levels 5,7,GK + daily challenge',
+            description: 'Quiz app with flagging & stats',
             start_url: '.',
             display: 'standalone',
             theme_color: '#1e293b',
@@ -948,7 +869,6 @@
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
-                installBtn.textContent = '📲 Install App';
                 installBtn.onclick = () => {
                     deferredPrompt.prompt();
                     deferredPrompt.userChoice.then(() => deferredPrompt = null);
@@ -971,16 +891,22 @@
 </script>
 
 <script>
-    // ========== 🖊️ EDITABLE CONFIGURATION – LEVELS, CHAPTERS, SUBTOPICS ==========
+    // ========== MAIN APP SCRIPT ==========
     (function(){
-        // ----- 1. LEVELS (add or remove levels here) -----
+        // ---------- CONSTANTS ----------
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXQeUllkncM06aiI10OQIz0uwRVToDbJWIRJzxWNgsAEwnuWuyHjdP8P572nO8feBewA/exec";
+        const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 1 day
+        const INITIAL_BATCH_SIZE = 5;
+        const RECENT_WINDOW = 7;
+        const SECONDS_PER_EXAM_QUESTION = 60;
+
+        // ---------- LEVELS & CHAPTERS (EDITABLE CONFIGURATION) ----------
         const LEVELS = {
             "level5": { display: "Level 5 (placeholders)" },
             "level7": { display: "Level 7" },
             "gk":     { display: "General Knowledge" }
         };
 
-        // ----- 2. CHAPTER NAMES – now defined per level -----
         const CHAPTER_NAMES_BY_LEVEL = {
             "level5": {
                 "1": "L5 - Structural Engineering",
@@ -1007,11 +933,19 @@
                 "10": "Professional Practices"
             },
             "gk": {
-                "11": "General Knowledge"
+                "1":  "Periodic Plans",
+                "2":  "Sustainable Dev",
+                "3":  "International Affairs",
+                "4":  "Constitution",
+                "5":  "Governance",
+                "6":  "Civil Service",
+                "7":  "Public Services",
+                "8":  "Charter",
+                "9":  "Public Policy",
+                "10": "Management",
+                "11": "Planning & Accounting"
             }
         };
-
-        // ----- 3. SUBTOPICS FOR EACH CHAPTER (per level) -----
 
         // Level 5 placeholders
         const LEVEL5_DATA = {
@@ -1080,21 +1014,19 @@
             "10": { "DPARSAD 1-113": "1V5JicjEQWiQy-UprrRfM_YJgXOQNwWgX" }
         };
 
-        // General Knowledge (chapter 11)
+        // General Knowledge – restructured into chapters 1‑11, each with DPARSAD (file ID if available) and GATE (empty)
         const GK_DATA = {
-            "11": {
-                "1. Periodic Plans":          "",
-                "2. Sustainable Dev":         "",
-                "3. International Affairs":   "",
-                "4. Constitution":            "",
-                "5. Governance":              "",
-                "6. Civil Service":           "1JJxacB5GWl6tPJupqpwh98s5V7EngJLw",
-                "7. Public Services":         "1eCtXLZrCZaZvYefOfH4eUEFny0e30cXo",
-                "8. Charter":                 "1sFSSB4hnSPgqiFxAWD1vF4Gkgm8FyKz5",
-                "9. Public Policy":           "1u3hA3p7wtUaDvzDioLVrFaq02WUuNCpt",
-                "10. Management":             "1G5BtPfzG_bnmDhIORtJM6N5cmCEiAt3A",
-                "11. Planning & Accounting":  "1ZIbu4pcNLDw-N_kGEUtdNVtJqxNX0c_T"
-            }
+            "1": { "DPARSAD": "", "GATE": "" },
+            "2": { "DPARSAD": "", "GATE": "" },
+            "3": { "DPARSAD": "", "GATE": "" },
+            "4": { "DPARSAD": "", "GATE": "" },
+            "5": { "DPARSAD": "", "GATE": "" },
+            "6": { "DPARSAD": "1JJxacB5GWl6tPJupqpwh98s5V7EngJLw", "GATE": "" },
+            "7": { "DPARSAD": "1eCtXLZrCZaZvYefOfH4eUEFny0e30cXo", "GATE": "" },
+            "8": { "DPARSAD": "1sFSSB4hnSPgqiFxAWD1vF4Gkgm8FyKz5", "GATE": "" },
+            "9": { "DPARSAD": "1u3hA3p7wtUaDvzDioLVrFaq02WUuNCpt", "GATE": "" },
+            "10": { "DPARSAD": "1G5BtPfzG_bnmDhIORtJM6N5cmCEiAt3A", "GATE": "" },
+            "11": { "DPARSAD": "1ZIbu4pcNLDw-N_kGEUtdNVtJqxNX0c_T", "GATE": "" }
         };
 
         const DRIVE_FILES_BY_LEVEL = {
@@ -1109,14 +1041,11 @@
             "gk": LEVELS["gk"].display
         };
 
-        // ========== END OF EDITABLE CONFIGURATION ==========
-        // ========== REST OF THE APP CODE ==========
-
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXQeUllkncM06aiI10OQIz0uwRVToDbJWIRJzxWNgsAEwnuWuyHjdP8P572nO8feBewA/exec";
-
-        // GLOBAL STATE
+        // ---------- GLOBAL STATE ----------
         let questions = [];
         let userAnswers = [];
+        let practiceAnswers = [];
+        let practiceResults = []; // true/false per question (practice modes)
         let currentIndex = 0;
         let timerInterval = null;
         let startTime = null;
@@ -1124,61 +1053,208 @@
         let totalExamTime = 0;
         let timeRemaining = 0;
         let quizActive = false;
-        let currentMode = null;
+        let currentMode = null; // 'standardExam', 'standardPractice', 'psycho', 'bookmarkReview', 'flaggedReview', 'dailyChallenge'
         let currentChapterName = "Unknown";
-        let practiceAnswers = [];
+
+        // Psycho flashcard streaming
         let fileQueue = [];
         let loadedQuestions = [];
         let recentFileIds = [];
-        const RECENT_WINDOW = 7;
         let isFetching = false;
-        let initialBatchSize = 5;
         let shownQuestions = [];
-        let shownAnswers = [];
+        let shownAnswers = []; // each element: { selected: null, result: null, fileId }
 
+        // Storage
         let wrongQuestionsByChapter = JSON.parse(localStorage.getItem('wrongQuestionsByChapter') || '{}');
-        let bookmarks = [];
+        let bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+        let flaggedQuestions = JSON.parse(localStorage.getItem('flaggedQuestions') || '[]');
 
-        function loadBookmarks() {
-            try {
-                bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
-            } catch (e) {
-                bookmarks = [];
-            }
-        }
-        function saveBookmarks() {
-            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
-        }
-        function isBookmarked(uid) {
-            return bookmarks.some(b => b.uid === uid);
-        }
+        // Cache for question files
+        let questionCache = JSON.parse(localStorage.getItem('questionCache') || '{}');
+
+        // ---------- HELPER FUNCTIONS ----------
+        function loadBookmarks() { try { bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]'); } catch { bookmarks = []; } }
+        function saveBookmarks() { localStorage.setItem('bookmarks', JSON.stringify(bookmarks)); }
+        function loadFlagged() { try { flaggedQuestions = JSON.parse(localStorage.getItem('flaggedQuestions') || '[]'); } catch { flaggedQuestions = []; } }
+        function saveFlagged() { localStorage.setItem('flaggedQuestions', JSON.stringify(flaggedQuestions)); }
+
+        function isBookmarked(uid) { return bookmarks.some(b => b.uid === uid); }
         function toggleBookmark(question) {
             if (!question.uid) return;
             const idx = bookmarks.findIndex(b => b.uid === question.uid);
-            if (idx === -1) {
-                bookmarks.push({ ...question });
-            } else {
-                bookmarks.splice(idx, 1);
-            }
+            if (idx === -1) bookmarks.push({ ...question });
+            else bookmarks.splice(idx, 1);
             saveBookmarks();
-            const starBtn = document.getElementById('star-btn-' + question.uid);
-            if (starBtn) {
-                if (idx === -1) {
-                    starBtn.classList.add('bookmarked');
-                    starBtn.textContent = '★';
-                } else {
-                    starBtn.classList.remove('bookmarked');
-                    starBtn.textContent = '☆';
-                }
+            updateStarButton(question.uid);
+        }
+        function isFlagged(uid) { return flaggedQuestions.some(f => f.uid === uid); }
+        function toggleFlag(question) {
+            if (!question.uid) return;
+            const idx = flaggedQuestions.findIndex(f => f.uid === question.uid);
+            if (idx === -1) flaggedQuestions.push({ ...question });
+            else flaggedQuestions.splice(idx, 1);
+            saveFlagged();
+            updateFlagButton(question.uid);
+        }
+
+        function updateStarButton(uid) {
+            const btn = document.getElementById('star-btn-' + uid);
+            if (btn) {
+                if (isBookmarked(uid)) { btn.classList.add('bookmarked'); btn.textContent = '★'; }
+                else { btn.classList.remove('bookmarked'); btn.textContent = '☆'; }
             }
         }
+        function updateFlagButton(uid) {
+            const btn = document.getElementById('flag-btn-' + uid);
+            if (btn) {
+                if (isFlagged(uid)) { btn.classList.add('flagged'); btn.textContent = '🚩'; }
+                else { btn.classList.remove('flagged'); btn.textContent = '⚑'; }
+            }
+        }
+
         function renderStarButton(question) {
             const uid = question.uid;
             const bookmarked = isBookmarked(uid);
-            return `<button id="star-btn-${uid}" class="btn btn-star ${bookmarked ? 'bookmarked' : ''}" onclick="window.toggleBookmarkFromObject(${JSON.stringify(question).replace(/"/g, '&quot;')})">${bookmarked ? '★' : '☆'}</button>`;
+            return `<button id="star-btn-${uid}" class="btn btn-star ${bookmarked ? 'bookmarked' : ''}" onclick="window.toggleBookmarkFromObject('${uid}')" aria-label="Bookmark">${bookmarked ? '★' : '☆'}</button>`;
         }
-        window.toggleBookmarkFromObject = function(q) {
-            toggleBookmark(q);
+        function renderFlagButton(question) {
+            const uid = question.uid;
+            const flagged = isFlagged(uid);
+            return `<button id="flag-btn-${uid}" class="btn btn-flag ${flagged ? 'flagged' : ''}" onclick="window.toggleFlagFromObject('${uid}')" aria-label="Flag as mistake">${flagged ? '🚩' : '⚑'}</button>`;
+        }
+
+        // Global toggles called from buttons
+        window.toggleBookmarkFromObject = function(uid) {
+            let q = null;
+            if (currentMode === 'standardPractice' || currentMode === 'bookmarkReview' || currentMode === 'flaggedReview' || currentMode === 'dailyChallenge') {
+                if (questions[currentIndex] && questions[currentIndex].uid === uid) q = questions[currentIndex];
+            } else if (currentMode === 'psycho') {
+                if (shownQuestions[currentIndex] && shownQuestions[currentIndex].uid === uid) q = shownQuestions[currentIndex];
+            } else if (currentMode === 'standardExam') {
+                q = questions.find(q => q.uid === uid);
+            }
+            if (q) toggleBookmark(q);
+        };
+        window.toggleFlagFromObject = function(uid) {
+            let q = null;
+            if (currentMode === 'standardPractice' || currentMode === 'bookmarkReview' || currentMode === 'flaggedReview' || currentMode === 'dailyChallenge') {
+                if (questions[currentIndex] && questions[currentIndex].uid === uid) q = questions[currentIndex];
+            } else if (currentMode === 'psycho') {
+                if (shownQuestions[currentIndex] && shownQuestions[currentIndex].uid === uid) q = shownQuestions[currentIndex];
+            } else if (currentMode === 'standardExam') {
+                q = questions.find(q => q.uid === uid);
+            }
+            if (q) toggleFlag(q);
+        };
+
+        // ---------- NEW JSON EXPORT FUNCTIONS (for Bookmarks & Flagged) ----------
+        function downloadJSON(data, filename) {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        window.exportBookmarksJSON = function() {
+            if (!bookmarks.length) {
+                alert('No bookmarks to export.');
+                return;
+            }
+            downloadJSON(bookmarks, 'bookmarks.json');
+        };
+
+        window.exportFlaggedJSON = function() {
+            if (!flaggedQuestions.length) {
+                alert('No flagged questions to export.');
+                return;
+            }
+            downloadJSON(flaggedQuestions, 'flagged.json');
+        };
+
+        // Cache functions
+        async function fetchWithCache(fileId) {
+            const cached = questionCache[fileId];
+            if (cached && (Date.now() - cached.timestamp) < CACHE_EXPIRY) {
+                return cached.data;
+            }
+            try {
+                const res = await fetch(`${APPS_SCRIPT_URL}?id=${fileId}`);
+                if (!res.ok) throw new Error('HTTP '+res.status);
+                const data = await res.json();
+                questionCache[fileId] = { timestamp: Date.now(), data };
+                localStorage.setItem('questionCache', JSON.stringify(questionCache));
+                return data;
+            } catch (e) {
+                console.warn('Fetch failed for', fileId, e);
+                // If offline and we have expired cache, return it anyway
+                if (cached) return cached.data;
+                return null;
+            }
+        }
+
+        function normalizeQuestions(qs, fileId) {
+            return qs.map((q, idx) => ({
+                id: q.id || idx,
+                options: q.options || [],
+                q: q.q || q.question || '',
+                correct: (q.correct !== undefined) ? q.correct : q.answer,
+                explanation: q.explanation || q.explain || '',
+                fileId: fileId,
+                uid: fileId + '_' + idx
+            }));
+        }
+
+        function isAnswerCorrect(selected, correct) {
+            if (selected===null || selected===undefined || correct===undefined) return false;
+            let s = String(selected).trim(), c = String(correct).trim();
+            if (!isNaN(s) && !isNaN(c)) return Number(s) === Number(c);
+            return s.toLowerCase() === c.toLowerCase();
+        }
+
+        function updateCounters() {
+            if (!practiceResults) return;
+            let correct = practiceResults.filter(r => r === true).length;
+            let incorrect = practiceResults.filter(r => r === false).length;
+            document.getElementById('correct-counter').innerText = `✅ ${correct}`;
+            document.getElementById('incorrect-counter').innerText = `❌ ${incorrect}`;
+        }
+
+        // ---------- HOME UI FUNCTIONS ----------
+        window.exportData = function() {
+            const data = {
+                bookmarks,
+                flaggedQuestions,
+                wrongQuestionsByChapter,
+                quizStats: JSON.parse(localStorage.getItem('quizStats') || '{}')
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'sathi-backup.json'; a.click();
+        };
+        window.importData = function() {
+            const input = document.createElement('input');
+            input.type = 'file'; input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (data.bookmarks) { bookmarks = data.bookmarks; saveBookmarks(); }
+                        if (data.flaggedQuestions) { flaggedQuestions = data.flaggedQuestions; saveFlagged(); }
+                        if (data.wrongQuestionsByChapter) { wrongQuestionsByChapter = data.wrongQuestionsByChapter; localStorage.setItem('wrongQuestionsByChapter', JSON.stringify(wrongQuestionsByChapter)); }
+                        if (data.quizStats) { localStorage.setItem('quizStats', JSON.stringify(data.quizStats)); }
+                        alert('Data imported successfully');
+                        displayHomeStats();
+                    } catch (err) { alert('Invalid file'); }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
         };
 
         function getChapterName(level, chapNum) {
@@ -1188,7 +1264,7 @@
             return `Chapter ${chapNum}`;
         }
 
-        function updateChapters() {
+        window.updateChapters = function() {
             const level = document.getElementById('level-select').value;
             const chapterSel = document.getElementById('chapter-select');
             const topicSel = document.getElementById('topic-select');
@@ -1209,9 +1285,9 @@
             }
             chapterSel.innerHTML = options;
             chapterSel.disabled = false;
-        }
+        };
 
-        function updateTopics() {
+        window.updateTopics = function() {
             const level = document.getElementById('level-select').value;
             const chapNum = document.getElementById('chapter-select').value;
             const topicSel = document.getElementById('topic-select');
@@ -1234,36 +1310,898 @@
                 if (!fid || !fid.trim()) opt.disabled = true;
                 topicSel.add(opt);
             }
-        }
-
-        function isAnswerCorrect(selected, correct) {
-            if (selected===null || selected===undefined || correct===undefined) return false;
-            let s = String(selected).trim(), c = String(correct).trim();
-            if (!isNaN(s) && !isNaN(c)) return Number(s) === Number(c);
-            return s.toLowerCase() === c.toLowerCase();
-        }
-
-        function normalizeQuestions(qs, fileId) {
-            return qs.map((q, idx) => ({
-                id: q.id || idx,
-                options: q.options || [],
-                q: q.q || q.question || '',
-                correct: (q.correct !== undefined) ? q.correct : q.answer,
-                explanation: q.explanation || q.explain || '',
-                fileId: fileId,
-                uid: fileId + '_' + idx
-            }));
-        }
-
-        // Per‑level select functions
-        window.selectLevel = function(levelKey) {
-            const checkboxes = document.querySelectorAll(`#chapter-list input[type="checkbox"][id^="chap-${levelKey}-"]:not(:disabled)`);
-            checkboxes.forEach(cb => cb.checked = true);
         };
-        window.deselectLevel = function(levelKey) {
-            const checkboxes = document.querySelectorAll(`#chapter-list input[type="checkbox"][id^="chap-${levelKey}-"]:not(:disabled)`);
-            checkboxes.forEach(cb => cb.checked = false);
+
+        window.fetchAndStart = async function(selectedMode) {
+            const level = document.getElementById('level-select').value;
+            const chapNum = document.getElementById('chapter-select').value;
+            const fileId = document.getElementById('topic-select').value;
+            if (!level || !chapNum || !fileId) return alert('Select level, chapter and subtopic');
+            currentChapterName = LEVEL_DISPLAY[level] + ' - ' + getChapterName(level, chapNum);
+
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+            try {
+                let raw = await fetchWithCache(fileId);
+                if (!raw) throw new Error('Failed to load');
+                questions = normalizeQuestions(raw, fileId);
+                startStandardQuiz(selectedMode);
+            } catch(e) {
+                alert('Drive error: ' + e.message);
+                location.reload();
+            }
         };
+
+        window.loadLocalFile = function(selectedMode) {
+            const file = document.getElementById('local-file-input').files[0];
+            if (!file) return alert('Select a JSON file');
+            document.getElementById('loading').classList.remove('hidden');
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const rawData = JSON.parse(e.target.result);
+                    if (!Array.isArray(rawData)) throw new Error('Must be an array');
+                    questions = normalizeQuestions(rawData, 'local');
+                    if (!questions.length) throw new Error('No questions');
+                    currentChapterName = "Local File";
+                    document.getElementById('home-view').classList.add('hidden');
+                    document.getElementById('loading').classList.add('hidden');
+                    startStandardQuiz(selectedMode);
+                } catch (err) {
+                    document.getElementById('loading').classList.add('hidden');
+                    alert('Error: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        function startStandardQuiz(selectedMode) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+            document.getElementById('result-view').classList.add('hidden');
+
+            if (selectedMode === 'exam') {
+                currentMode = 'standardExam';
+                document.getElementById('flashcard-ui').classList.add('hidden');
+                document.getElementById('standard-exam-ui').classList.remove('hidden');
+                document.getElementById('mode-display').innerText = 'EXAM (all at once)';
+
+                const container = document.getElementById('questions-container');
+                container.innerHTML = '';
+                userAnswers = new Array(questions.length).fill(null);
+                questions.forEach((q, i) => {
+                    let optsHtml = q.options.map((opt, idx) => `
+                        <label><input type="radio" name="q${i}" value="${idx}" onchange="saveExamAnswer(${i}, ${idx})"> ${opt}</label>
+                    `).join('');
+                    container.innerHTML += `
+                        <div class="question-card">
+                            <p><strong>${i+1}. ${q.q}</strong> ${renderStarButton(q)} ${renderFlagButton(q)}</p>
+                            <div class="options-group">${optsHtml}</div>
+                        </div>`;
+                });
+
+                totalExamTime = questions.length * SECONDS_PER_EXAM_QUESTION;
+                timeRemaining = totalExamTime;
+                timeUsed = 0;
+            } else {
+                currentMode = 'standardPractice';
+                document.getElementById('flashcard-ui').classList.remove('hidden');
+                document.getElementById('standard-exam-ui').classList.add('hidden');
+                document.getElementById('mode-display').innerText = 'PRACTICE (series)';
+
+                practiceAnswers = new Array(questions.length).fill(null);
+                practiceResults = new Array(questions.length).fill(null);
+                currentIndex = 0;
+                renderPracticeQuestion();
+                document.getElementById('nextBtn').disabled = true;
+                document.getElementById('prevBtn').disabled = currentIndex === 0;
+                document.getElementById('streaming-status').innerText = '';
+                timeUsed = 0;
+            }
+
+            quizActive = true;
+            startTime = Date.now();
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        window.saveExamAnswer = function(qIndex, optIndex) {
+            if (quizActive) userAnswers[qIndex] = optIndex;
+        };
+
+        function updateTimer() {
+            if (!quizActive) return;
+            if (currentMode === 'standardExam') {
+                timeRemaining--;
+                if (timeRemaining <= 0) {
+                    timeRemaining = 0;
+                    submitQuiz();
+                    return;
+                }
+                let mins = Math.floor(timeRemaining / 60);
+                let secs = timeRemaining % 60;
+                document.getElementById('timer-display').innerText = `${mins}:${secs.toString().padStart(2,'0')}`;
+                const timerEl = document.getElementById('timer-display');
+                if (timeRemaining <= 60) timerEl.className = 'timer danger';
+                else if (timeRemaining <= 300) timerEl.className = 'timer warning';
+                else timerEl.className = 'timer';
+            } else {
+                let elapsed = Math.floor((Date.now() - startTime) / 1000);
+                let mins = Math.floor(elapsed / 60), secs = elapsed % 60;
+                document.getElementById('timer-display').innerText = `${mins}:${secs.toString().padStart(2,'0')}`;
+                timeUsed = elapsed;
+            }
+        }
+
+        function renderPracticeQuestion() {
+            let q = questions[currentIndex];
+            let ans = practiceAnswers[currentIndex];
+            let searchBtnHtml = `<button class="btn btn-small" onclick="searchCurrentQuestion()" aria-label="Search online">🔍</button>`;
+            let starHtml = renderStarButton(q);
+            let flagHtml = renderFlagButton(q);
+            document.getElementById('question-text').innerHTML = `${currentIndex+1}. ${q.q} ${searchBtnHtml} ${starHtml} ${flagHtml}`;
+            let optsHtml = q.options.map((opt, idx) => {
+                let checked = (ans === idx) ? 'checked' : '';
+                return `<label id="opt-${idx}" class="option-label"><input type="radio" name="practice-opt" value="${idx}" ${checked} onchange="onPracticeAnswer(${idx})"> ${opt}</label>`;
+            }).join('');
+            document.getElementById('options-container').innerHTML = optsHtml;
+            document.getElementById('explanation-box').classList.add('hidden');
+            document.querySelectorAll('.option-label').forEach(el => el.classList.remove('option-correct', 'option-incorrect'));
+            let answered = practiceAnswers.filter(a => a !== null).length;
+            document.getElementById('progress-fill').style.width = (answered / questions.length * 100) + '%';
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+            // Next will be enabled after answering
+            document.getElementById('nextBtn').disabled = true;
+            updateFlagButton(q.uid);
+            updateStarButton(q.uid);
+        }
+
+        window.onPracticeAnswer = function(selectedIdx) {
+            if (!quizActive) return;
+            practiceAnswers[currentIndex] = selectedIdx;
+            let q = questions[currentIndex];
+            let correctIdx = parseInt(q.correct);
+            document.querySelectorAll('.option-label').forEach((label, idx) => {
+                label.classList.remove('option-correct', 'option-incorrect');
+                if (idx === correctIdx) label.classList.add('option-correct');
+                else if (idx === selectedIdx && !isAnswerCorrect(selectedIdx, correctIdx)) label.classList.add('option-incorrect');
+            });
+            document.getElementById('explanation-box').classList.remove('hidden');
+            document.getElementById('explanation-box').innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
+
+            let isCorrect = isAnswerCorrect(selectedIdx, correctIdx);
+            practiceResults[currentIndex] = isCorrect;
+            updateCounters();
+
+            const isLast = currentIndex === questions.length - 1;
+            document.getElementById('nextBtn').disabled = isLast;
+        };
+
+        window.prevQuestion = function() {
+            if (currentMode === 'standardPractice' && currentIndex > 0) {
+                currentIndex--;
+                renderPracticeQuestion();
+            } else if (currentMode === 'psycho' && currentIndex > 0) {
+                currentIndex--;
+                renderFlashcardQuestion();
+            } else if (currentMode === 'bookmarkReview' && currentIndex > 0) {
+                currentIndex--;
+                renderPracticeQuestion();
+            } else if (currentMode === 'flaggedReview' && currentIndex > 0) {
+                currentIndex--;
+                renderPracticeQuestion();
+            } else if (currentMode === 'dailyChallenge' && currentIndex > 0) {
+                currentIndex--;
+                renderPracticeQuestion();
+            }
+        };
+
+        window.nextQuestion = function() {
+            if (currentMode === 'standardPractice' && currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderPracticeQuestion();
+            } else if (currentMode === 'psycho') {
+                nextFlashcard();
+            } else if (currentMode === 'bookmarkReview' && currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderPracticeQuestion();
+            } else if (currentMode === 'flaggedReview' && currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderPracticeQuestion();
+            } else if (currentMode === 'dailyChallenge' && currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderPracticeQuestion();
+            }
+        };
+
+        window.calculateExamResults = function() {
+            if (!quizActive) return;
+            quizActive = false;
+            clearInterval(timerInterval);
+            document.getElementById('quiz-view').classList.add('hidden');
+            document.getElementById('result-view').classList.remove('hidden');
+
+            let correct = 0, incorrect = 0, skipped = 0;
+            let reviewHtml = '';
+            questions.forEach((q, i) => {
+                let selected = userAnswers[i];
+                let isCorrect = isAnswerCorrect(selected, q.correct);
+                if (selected === null) skipped++;
+                else if (isCorrect) correct++;
+                else incorrect++;
+
+                let optsHtml = q.options.map((opt, idx) => {
+                    let style = "padding:0.8rem; margin:0.5rem 0; border:1px solid var(--border); border-radius:1rem;";
+                    let label = "";
+                    if (isAnswerCorrect(idx, q.correct)) {
+                        style = "padding:0.8rem; margin:0.5rem 0; border:3px solid #22c55e; border-radius:1rem; background:#dcfce7; font-weight:600;";
+                        label = " <span style='float:right'>✔</span>";
+                    } else if (idx === selected && !isCorrect) {
+                        style = "padding:0.8rem; margin:0.5rem 0; border:3px solid #ef4444; border-radius:1rem; background:#fee2e2;";
+                        label = " <span style='float:right'>✖</span>";
+                    }
+                    return `<div style="${style}">${opt}${label}</div>`;
+                }).join('');
+
+                reviewHtml += `<div class="question-card" style="border-left:12px solid ${isCorrect ? '#10b981' : '#ef4444'}">
+                    <p><strong>${i+1}. ${q.q}</strong> ${renderStarButton(q)} ${renderFlagButton(q)} <button class="btn btn-small" onclick='searchQuestionFromReview("${q.q.replace(/"/g, '&quot;')}", ${JSON.stringify(q.options)})'>🔍</button></p>
+                    ${optsHtml}
+                    ${selected===null?'<p style="color:var(--danger);">⚠️ Skipped</p>':''}
+                    <div class="explanation-box">💡 ${q.explanation}</div></div>`;
+            });
+
+            let timeTaken = totalExamTime - timeRemaining;
+            displayResults(correct, incorrect, skipped, questions.length, reviewHtml, currentChapterName, timeTaken);
+            saveWrongQuestions(currentChapterName);
+            if (correct === questions.length) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        };
+
+        function finishPractice() {
+            if (!quizActive) return;
+            quizActive = false;
+            clearInterval(timerInterval);
+            document.getElementById('quiz-view').classList.add('hidden');
+            document.getElementById('result-view').classList.remove('hidden');
+
+            let correct = 0, incorrect = 0, skipped = 0;
+            questions.forEach((q, i) => {
+                let selected = practiceAnswers[i];
+                let isCorrect = isAnswerCorrect(selected, q.correct);
+                if (selected === null) skipped++;
+                else if (isCorrect) correct++;
+                else incorrect++;
+            });
+
+            let reviewHtml = '';
+            questions.forEach((q, i) => {
+                let selected = practiceAnswers[i];
+                let isCorrect = isAnswerCorrect(selected, q.correct);
+                let optsHtml = q.options.map((opt, idx) => {
+                    let style = "padding:0.8rem; margin:0.5rem 0; border:1px solid var(--border); border-radius:1rem;";
+                    let label = "";
+                    if (isAnswerCorrect(idx, q.correct)) {
+                        style = "padding:0.8rem; margin:0.5rem 0; border:3px solid #22c55e; border-radius:1rem; background:#dcfce7; font-weight:600;";
+                        label = " <span style='float:right'>✔</span>";
+                    } else if (idx === selected && !isCorrect) {
+                        style = "padding:0.8rem; margin:0.5rem 0; border:3px solid #ef4444; border-radius:1rem; background:#fee2e2;";
+                        label = " <span style='float:right'>✖</span>";
+                    }
+                    return `<div style="${style}">${opt}${label}</div>`;
+                }).join('');
+
+                reviewHtml += `<div class="question-card" style="border-left:12px solid ${isCorrect ? '#10b981' : '#ef4444'}">
+                    <p><strong>${i+1}. ${q.q}</strong> ${renderStarButton(q)} ${renderFlagButton(q)} <button class="btn btn-small" onclick='searchQuestionFromReview("${q.q.replace(/"/g, '&quot;')}", ${JSON.stringify(q.options)})'>🔍</button></p>
+                    ${optsHtml}
+                    ${selected===null?'<p style="color:var(--danger);">⚠️ Skipped</p>':''}
+                    <div class="explanation-box">💡 ${q.explanation}</div></div>`;
+            });
+
+            displayResults(correct, incorrect, skipped, questions.length, reviewHtml, currentChapterName, timeUsed);
+            saveWrongQuestions(currentChapterName);
+            if (correct === questions.length) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        }
+
+        function displayResults(correct, incorrect, skipped, total, reviewHtml, topicName, timeSpent) {
+            document.getElementById('stat-correct').innerText = correct;
+            document.getElementById('stat-incorrect').innerText = incorrect;
+            document.getElementById('stat-skipped').innerText = skipped;
+            document.getElementById('stat-time').innerText = timeSpent + 's';
+            document.getElementById('final-score').innerHTML = `${correct} <span style="font-size:2rem;">/ ${total}</span>`;
+            document.getElementById('review-container').innerHTML = reviewHtml;
+
+            let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
+            if (!stats[topicName]) stats[topicName] = { total:0, correct:0, time:0 };
+            stats[topicName].total += total;
+            stats[topicName].correct += correct;
+            stats[topicName].time += timeSpent;
+            localStorage.setItem('quizStats', JSON.stringify(stats));
+            displayHomeStats();
+        }
+
+        function saveWrongQuestions(topicName) {
+            let wrong = [];
+            questions.forEach((q, i) => {
+                let selected = (currentMode === 'standardExam') ? userAnswers[i] : practiceAnswers[i];
+                if (selected !== null && !isAnswerCorrect(selected, q.correct)) {
+                    wrong.push(q);
+                }
+            });
+            if (wrong.length > 0) {
+                wrongQuestionsByChapter[topicName] = wrong;
+                localStorage.setItem('wrongQuestionsByChapter', JSON.stringify(wrongQuestionsByChapter));
+            }
+        }
+
+        // ---------- PSYCHO FLASHCARD ----------
+        window.startPsychoFlashcard = async function() {
+            const checkboxes = document.querySelectorAll('#chapter-list input[type="checkbox"]:checked:not(:disabled)');
+            const selected = Array.from(checkboxes).map(cb => cb.value);
+            if (!selected.length) return alert('Select at least one chapter with questions');
+            let fileIds = [];
+            for (let val of selected) {
+                let [levelKey, chapNum] = val.split('|');
+                let subtopics = DRIVE_FILES_BY_LEVEL[levelKey]?.[chapNum] || {};
+                for (let fid of Object.values(subtopics)) if (fid && fid.trim()) fileIds.push(fid);
+            }
+            if (!fileIds.length) return alert('No valid file IDs');
+            document.getElementById('psychoBtn').disabled = true;
+            document.getElementById('psychoProgress').innerText = 'Preparing...';
+            fileQueue = shuffleArray(fileIds);
+            loadedQuestions = []; recentFileIds = []; shownQuestions = []; shownAnswers = [];
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+            document.getElementById('flashcard-ui').classList.remove('hidden');
+            document.getElementById('standard-exam-ui').classList.add('hidden');
+            document.getElementById('result-view').classList.add('hidden');
+            currentMode = 'psycho';
+            currentChapterName = 'Psycho Flashcard';
+            quizActive = true;
+            startTime = Date.now();
+            timeUsed = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            document.getElementById('mode-display').innerText = 'PSYCHO FLASHCARD';
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('streaming-status').innerText = 'Loading...';
+            isFetching = true;
+            let filesToFetch = Math.min(INITIAL_BATCH_SIZE, fileQueue.length);
+            for (let i = 0; i < filesToFetch; i++) await fetchOneFileAndAddToPool();
+            isFetching = false;
+            if (!loadedQuestions.length) {
+                alert('No questions loaded');
+                document.getElementById('home-view').classList.remove('hidden');
+                document.getElementById('quiz-view').classList.add('hidden');
+                document.getElementById('psychoBtn').disabled = false;
+                document.getElementById('psychoProgress').innerText = '';
+                return;
+            }
+            let firstQ = pickQuestionFromPool();
+            if (firstQ) showFlashcardQuestion(firstQ);
+            document.getElementById('psychoBtn').disabled = false;
+            document.getElementById('streaming-status').innerText = `Pool: ${loadedQuestions.length}`;
+        };
+
+        async function fetchOneFileAndAddToPool() {
+            if (!fileQueue.length) return;
+            const fileId = fileQueue.shift();
+            try {
+                let raw = await fetchWithCache(fileId);
+                if (raw) loadedQuestions.push(...normalizeQuestions(raw, fileId));
+            } catch (e) { console.warn('Failed', fileId); }
+        }
+
+        function pickQuestionFromPool() {
+            if (!loadedQuestions.length) return null;
+            let available = loadedQuestions.filter(q => !recentFileIds.includes(q.fileId));
+            if (!available.length) { recentFileIds = []; available = loadedQuestions; }
+            let idx = Math.floor(Math.random() * available.length);
+            let chosen = available[idx];
+            loadedQuestions = loadedQuestions.filter(q => q !== chosen);
+            recentFileIds.push(chosen.fileId);
+            if (recentFileIds.length > RECENT_WINDOW) recentFileIds.shift();
+            return chosen;
+        }
+
+        function showFlashcardQuestion(q) {
+            shownQuestions.push(q);
+            shownAnswers.push({ selected: null, result: null, fileId: q.fileId });
+            currentIndex = shownQuestions.length - 1;
+            renderFlashcardQuestion();
+        }
+
+        function renderFlashcardQuestion() {
+            let q = shownQuestions[currentIndex];
+            let ans = shownAnswers[currentIndex];
+            let searchBtnHtml = `<button class="btn btn-small" onclick="searchCurrentQuestion()" aria-label="Search online">🔍</button>`;
+            let starHtml = renderStarButton(q);
+            let flagHtml = renderFlagButton(q);
+            document.getElementById('question-text').innerHTML = `${currentIndex+1}. ${q.q} ${searchBtnHtml} ${starHtml} ${flagHtml}`;
+            let optsHtml = q.options.map((opt, idx) => {
+                let checked = (ans.selected === idx) ? 'checked' : '';
+                return `<label id="opt-${idx}" class="option-label"><input type="radio" name="flash-opt" value="${idx}" ${checked} onchange="onFlashcardAnswer(${idx})"> ${opt}</label>`;
+            }).join('');
+            document.getElementById('options-container').innerHTML = optsHtml;
+            document.getElementById('explanation-box').classList.add('hidden');
+            document.querySelectorAll('.option-label').forEach(el => el.classList.remove('option-correct', 'option-incorrect'));
+            document.getElementById('nextBtn').disabled = true;
+            let answeredCount = shownAnswers.filter(a => a.selected !== null).length;
+            document.getElementById('progress-fill').style.width = (answeredCount / shownQuestions.length * 100) + '%';
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+            updateFlagButton(q.uid);
+            updateStarButton(q.uid);
+        }
+
+        window.onFlashcardAnswer = function(selectedIdx) {
+            if (!quizActive) return;
+            shownAnswers[currentIndex].selected = selectedIdx;
+            let q = shownQuestions[currentIndex];
+            let correctIdx = parseInt(q.correct);
+            document.querySelectorAll('.option-label').forEach((label, idx) => {
+                label.classList.remove('option-correct', 'option-incorrect');
+                if (idx === correctIdx) label.classList.add('option-correct');
+                else if (idx === selectedIdx && !isAnswerCorrect(selectedIdx, correctIdx)) label.classList.add('option-incorrect');
+            });
+            document.getElementById('explanation-box').classList.remove('hidden');
+            document.getElementById('explanation-box').innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
+
+            let isCorrect = isAnswerCorrect(selectedIdx, correctIdx);
+            shownAnswers[currentIndex].result = isCorrect;
+
+            // Update overall counters
+            let correctCount = shownAnswers.filter(a => a.result === true).length;
+            let incorrectCount = shownAnswers.filter(a => a.result === false).length;
+            document.getElementById('correct-counter').innerText = `✅ ${correctCount}`;
+            document.getElementById('incorrect-counter').innerText = `❌ ${incorrectCount}`;
+
+            const isLast = currentIndex === shownQuestions.length - 1 && !fileQueue.length && !loadedQuestions.length;
+            document.getElementById('nextBtn').disabled = isLast;
+            maybeFetchNextFile();
+        };
+
+        async function nextFlashcard() {
+            document.getElementById('nextBtn').disabled = true;
+            let nextQ = pickQuestionFromPool();
+            if (nextQ) showFlashcardQuestion(nextQ);
+            else if (fileQueue.length && !isFetching) {
+                isFetching = true;
+                document.getElementById('streaming-status').innerText = 'Fetching...';
+                await fetchOneFileAndAddToPool();
+                isFetching = false;
+                nextQ = pickQuestionFromPool();
+                if (nextQ) showFlashcardQuestion(nextQ);
+                else document.getElementById('question-text').innerText = 'No more questions.';
+            } else document.getElementById('question-text').innerText = 'No more questions.';
+        }
+
+        async function maybeFetchNextFile() {
+            if (isFetching || !fileQueue.length) return;
+            isFetching = true;
+            document.getElementById('streaming-status').innerText = 'Background...';
+            await fetchOneFileAndAddToPool();
+            isFetching = false;
+            document.getElementById('streaming-status').innerText = `Pool: ${loadedQuestions.length}`;
+        }
+
+        function submitPsychoResults() {
+            let correct = 0, incorrect = 0, skipped = 0, reviewHtml = '';
+            shownQuestions.forEach((q, i) => {
+                let selected = shownAnswers[i]?.selected;
+                let isCorrect = isAnswerCorrect(selected, q.correct);
+                if (selected === null) skipped++;
+                else if (isCorrect) correct++;
+                else incorrect++;
+                let optsHtml = q.options.map((opt, idx) => {
+                    let style = "padding:0.8rem; margin:0.5rem 0; border:1px solid var(--border); border-radius:1rem;";
+                    let label = "";
+                    if (isAnswerCorrect(idx, q.correct)) {
+                        style = "padding:0.8rem; margin:0.5rem 0; border:3px solid #22c55e; border-radius:1rem; background:#dcfce7; font-weight:600;";
+                        label = " <span style='float:right'>✔</span>";
+                    } else if (idx === selected && !isCorrect) {
+                        style = "padding:0.8rem; margin:0.5rem 0; border:3px solid #ef4444; border-radius:1rem; background:#fee2e2;";
+                        label = " <span style='float:right'>✖</span>";
+                    }
+                    return `<div style="${style}">${opt}${label}</div>`;
+                }).join('');
+
+                reviewHtml += `<div class="question-card" style="border-left:12px solid ${isCorrect ? '#10b981' : '#ef4444'}">
+                    <p><strong>${i+1}. ${q.q}</strong> ${renderStarButton(q)} ${renderFlagButton(q)} <button class="btn btn-small" onclick='searchQuestionFromReview("${q.q.replace(/"/g, '&quot;')}", ${JSON.stringify(q.options)})'>🔍</button></p>
+                    ${optsHtml}
+                    ${selected===null?'<p style="color:var(--danger);">⚠️ Skipped</p>':''}
+                    <div class="explanation-box">💡 ${q.explanation}</div></div>`;
+            });
+            displayResults(correct, incorrect, skipped, shownQuestions.length, reviewHtml, 'Psycho Flashcard', timeUsed);
+            saveWrongQuestions('Psycho Flashcard');
+            if (correct === shownQuestions.length) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+
+            quizActive = false;
+            clearInterval(timerInterval);
+            document.getElementById('quiz-view').classList.add('hidden');
+            document.getElementById('result-view').classList.remove('hidden');
+        }
+
+        window.startPsychoExam = async function() {
+            const checkboxes = document.querySelectorAll('#chapter-list input[type="checkbox"]:checked:not(:disabled)');
+            const selected = Array.from(checkboxes).map(cb => cb.value);
+            if (!selected.length) return alert('Select at least one chapter with questions');
+            let fileIds = [];
+            for (let val of selected) {
+                let [levelKey, chapNum] = val.split('|');
+                let subtopics = DRIVE_FILES_BY_LEVEL[levelKey]?.[chapNum] || {};
+                for (let fid of Object.values(subtopics)) if (fid && fid.trim()) fileIds.push(fid);
+            }
+            if (!fileIds.length) return alert('No valid file IDs');
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('loading').innerHTML = 'Fetching questions... <span id="fetch-progress">0/0</span>';
+            let allQuestions = [];
+            const totalFiles = fileIds.length;
+            let fetchedCount = 0;
+            const updateProgress = () => {
+                const span = document.getElementById('fetch-progress');
+                if (span) span.innerText = `${fetchedCount}/${totalFiles}`;
+            };
+            updateProgress();
+            for (let fileId of fileIds) {
+                try {
+                    let raw = await fetchWithCache(fileId);
+                    if (raw) allQuestions.push(...normalizeQuestions(raw, fileId));
+                } catch (e) { console.warn('Failed', fileId); }
+                fetchedCount++;
+                updateProgress();
+            }
+            if (!allQuestions.length) {
+                alert('No questions loaded');
+                document.getElementById('home-view').classList.remove('hidden');
+                document.getElementById('loading').classList.add('hidden');
+                return;
+            }
+            allQuestions = shuffleArray(allQuestions);
+            questions = allQuestions.slice(0, 100);
+            currentChapterName = 'Psycho Exam (100 random)';
+            currentMode = 'standardExam';
+            document.getElementById('loading').classList.add('hidden');
+            startStandardQuiz('exam');
+        };
+
+        // ---------- BOOKMARK & FLAGGED REVIEW ----------
+        window.startBookmarkReview = function() {
+            loadBookmarks();
+            if (bookmarks.length === 0) { alert('No bookmarked questions.'); return; }
+            questions = bookmarks.map(q => ({ ...q }));
+            practiceAnswers = new Array(questions.length).fill(null);
+            practiceResults = new Array(questions.length).fill(null);
+            currentIndex = 0;
+            currentMode = 'bookmarkReview';
+            currentChapterName = 'Bookmarked Questions';
+
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+            document.getElementById('result-view').classList.add('hidden');
+            document.getElementById('flashcard-ui').classList.remove('hidden');
+            document.getElementById('standard-exam-ui').classList.add('hidden');
+            document.getElementById('mode-display').innerText = 'BOOKMARK REVIEW';
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('prevBtn').disabled = true;
+            document.getElementById('streaming-status').innerText = '';
+            quizActive = true;
+            startTime = Date.now();
+            timeUsed = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            renderPracticeQuestion();
+        };
+
+        window.startFlaggedReview = function() {
+            loadFlagged();
+            if (flaggedQuestions.length === 0) { alert('No flagged questions.'); return; }
+            questions = flaggedQuestions.map(q => ({ ...q }));
+            practiceAnswers = new Array(questions.length).fill(null);
+            practiceResults = new Array(questions.length).fill(null);
+            currentIndex = 0;
+            currentMode = 'flaggedReview';
+            currentChapterName = 'Flagged Questions';
+
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+            document.getElementById('result-view').classList.add('hidden');
+            document.getElementById('flashcard-ui').classList.remove('hidden');
+            document.getElementById('standard-exam-ui').classList.add('hidden');
+            document.getElementById('mode-display').innerText = 'FLAGGED REVIEW';
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('prevBtn').disabled = true;
+            document.getElementById('streaming-status').innerText = '';
+            quizActive = true;
+            startTime = Date.now();
+            timeUsed = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            renderPracticeQuestion();
+        };
+
+        // ---------- DAILY CHALLENGE ----------
+        async function generateDailySet() {
+            const today = new Date().toISOString().slice(0, 10);
+            const stored = localStorage.getItem('dailySet');
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (parsed.date === today && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
+                        return;
+                    }
+                } catch (e) {}
+            }
+
+            let allFileIds = [];
+            for (let level of ['level7', 'gk']) {
+                let chapters = DRIVE_FILES_BY_LEVEL[level];
+                for (let chap in chapters) {
+                    for (let fid of Object.values(chapters[chap])) {
+                        if (fid && fid.trim()) allFileIds.push(fid);
+                    }
+                }
+            }
+            if (allFileIds.length === 0) return;
+
+            const seed = parseInt(today.split('-').join(''), 10);
+            const rng = mulberry32(seed);
+            const shuffled = shuffleArraySeeded(allFileIds, rng);
+            const selectedFileIds = shuffled.slice(0, 20);
+
+            let dailyQuestions = [];
+            for (let fid of selectedFileIds) {
+                try {
+                    let raw = await fetchWithCache(fid);
+                    if (raw) {
+                        let normalized = normalizeQuestions(raw, fid);
+                        if (normalized.length > 0) {
+                            let idx = Math.floor(rng() * normalized.length);
+                            dailyQuestions.push(normalized[idx]);
+                        }
+                    }
+                } catch (e) { console.warn('Failed', fid); }
+            }
+            if (dailyQuestions.length > 0) {
+                localStorage.setItem('dailySet', JSON.stringify({
+                    date: today,
+                    questions: dailyQuestions
+                }));
+            }
+        }
+
+        window.startDailyChallenge = async function() {
+            const today = new Date().toISOString().slice(0, 10);
+            const stored = localStorage.getItem('dailySet');
+            let dailyQuestions = null;
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (parsed.date === today && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
+                        dailyQuestions = parsed.questions;
+                    }
+                } catch (e) {}
+            }
+
+            if (!dailyQuestions) {
+                document.getElementById('daily-progress').innerText = 'Generating today\'s set, please wait...';
+                await generateDailySet();
+                const newStored = localStorage.getItem('dailySet');
+                if (newStored) {
+                    try {
+                        dailyQuestions = JSON.parse(newStored).questions;
+                    } catch (e) {}
+                }
+                document.getElementById('daily-progress').innerText = '';
+            }
+
+            if (!dailyQuestions || dailyQuestions.length === 0) {
+                alert('Failed to load daily questions. Please try again later.');
+                return;
+            }
+
+            questions = dailyQuestions.map(q => ({ ...q }));
+            practiceAnswers = new Array(questions.length).fill(null);
+            practiceResults = new Array(questions.length).fill(null);
+            currentIndex = 0;
+            currentMode = 'dailyChallenge';
+            currentChapterName = 'Aajka Sawal (Daily 20)';
+
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+            document.getElementById('result-view').classList.add('hidden');
+            document.getElementById('flashcard-ui').classList.remove('hidden');
+            document.getElementById('standard-exam-ui').classList.add('hidden');
+            document.getElementById('mode-display').innerText = 'DAILY CHALLENGE';
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('prevBtn').disabled = true;
+            document.getElementById('streaming-status').innerText = '';
+            quizActive = true;
+            startTime = Date.now();
+            timeUsed = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            renderPracticeQuestion();
+        };
+
+        setTimeout(() => {
+            generateDailySet().catch(e => console.warn('Daily generation error', e));
+        }, 1000);
+
+        function mulberry32(a) {
+            return function() {
+                a |= 0; a = a + 0x6D2B79F5 | 0;
+                let t = Math.imul(a ^ a >>> 15, 1 | a);
+                t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+                return ((t ^ t >>> 14) >>> 0) / 4294967296;
+            };
+        }
+
+        function shuffleArraySeeded(arr, rng) {
+            let a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(rng() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        // ---------- REVIEW WRONG ----------
+        window.reviewWrongChapter = function(topicName) {
+            let wrong = wrongQuestionsByChapter[topicName];
+            if (!wrong || wrong.length === 0) {
+                alert('No wrong answers recorded for this chapter yet. Complete a quiz first!');
+                return;
+            }
+            questions = wrong.map(q => ({...q}));
+            practiceAnswers = new Array(questions.length).fill(null);
+            practiceResults = new Array(questions.length).fill(null);
+            currentIndex = 0;
+            currentMode = 'standardPractice';
+            currentChapterName = topicName + ' (wrong)';
+
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+            document.getElementById('result-view').classList.add('hidden');
+            document.getElementById('flashcard-ui').classList.remove('hidden');
+            document.getElementById('standard-exam-ui').classList.add('hidden');
+            document.getElementById('mode-display').innerText = 'PRACTICE (wrong)';
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('prevBtn').disabled = true;
+            quizActive = true;
+            startTime = Date.now();
+            timeUsed = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            renderPracticeQuestion();
+        };
+
+        window.searchCurrentQuestion = function() {
+            let questionText = '', options = [];
+            if (currentMode === 'standardPractice' && questions[currentIndex]) {
+                questionText = questions[currentIndex].q;
+                options = questions[currentIndex].options || [];
+            } else if (currentMode === 'psycho' && shownQuestions[currentIndex]) {
+                questionText = shownQuestions[currentIndex].q;
+                options = shownQuestions[currentIndex].options || [];
+            } else if (currentMode === 'bookmarkReview' && questions[currentIndex]) {
+                questionText = questions[currentIndex].q;
+                options = questions[currentIndex].options || [];
+            } else if (currentMode === 'flaggedReview' && questions[currentIndex]) {
+                questionText = questions[currentIndex].q;
+                options = questions[currentIndex].options || [];
+            } else if (currentMode === 'dailyChallenge' && questions[currentIndex]) {
+                questionText = questions[currentIndex].q;
+                options = questions[currentIndex].options || [];
+            } else return;
+            let query = questionText + (options.length ? ' ' + options.join(' ') : '');
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+        };
+
+        window.searchQuestionFromReview = function(questionText, options) {
+            let query = questionText + (options && options.length ? ' ' + options.join(' ') : '');
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+        };
+
+        window.submitQuiz = function() {
+            if (!quizActive) return;
+            if (currentMode === 'standardExam') calculateExamResults();
+            else if (currentMode === 'standardPractice') finishPractice();
+            else if (currentMode === 'psycho') submitPsychoResults();
+            else if (currentMode === 'bookmarkReview') finishPractice();
+            else if (currentMode === 'flaggedReview') finishPractice();
+            else if (currentMode === 'dailyChallenge') finishPractice();
+        };
+
+        window.practiceWrong = function() {
+            let wrongQs, wrongAnswers, sourceChapter;
+            if (currentMode === 'standardExam') {
+                wrongQs = questions.filter((q, i) => !isAnswerCorrect(userAnswers[i], q.correct));
+                wrongAnswers = new Array(wrongQs.length).fill(null);
+                sourceChapter = currentChapterName;
+            } else if (currentMode === 'standardPractice') {
+                wrongQs = questions.filter((q, i) => !isAnswerCorrect(practiceAnswers[i], q.correct));
+                wrongAnswers = new Array(wrongQs.length).fill(null);
+                sourceChapter = currentChapterName;
+            } else if (currentMode === 'psycho') {
+                wrongQs = shownQuestions.filter((q, i) => !isAnswerCorrect(shownAnswers[i]?.selected, q.correct));
+                wrongAnswers = new Array(wrongQs.length).fill(null);
+                sourceChapter = 'Psycho Flashcard';
+            } else if (currentMode === 'bookmarkReview') {
+                wrongQs = questions.filter((q, i) => !isAnswerCorrect(practiceAnswers[i], q.correct));
+                wrongAnswers = new Array(wrongQs.length).fill(null);
+                sourceChapter = 'Bookmarked Questions';
+            } else if (currentMode === 'flaggedReview') {
+                wrongQs = questions.filter((q, i) => !isAnswerCorrect(practiceAnswers[i], q.correct));
+                wrongAnswers = new Array(wrongQs.length).fill(null);
+                sourceChapter = 'Flagged Questions';
+            } else if (currentMode === 'dailyChallenge') {
+                wrongQs = questions.filter((q, i) => !isAnswerCorrect(practiceAnswers[i], q.correct));
+                wrongAnswers = new Array(wrongQs.length).fill(null);
+                sourceChapter = 'Daily Challenge';
+            } else return;
+            if (!wrongQs.length) { alert('No wrong answers!'); return; }
+            questions = wrongQs.map(q => ({...q}));
+            practiceAnswers = wrongAnswers;
+            practiceResults = new Array(questions.length).fill(null);
+            currentMode = 'standardPractice';
+            currentChapterName = sourceChapter + ' (wrong)';
+            currentIndex = 0;
+            document.getElementById('result-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+            document.getElementById('flashcard-ui').classList.remove('hidden');
+            document.getElementById('standard-exam-ui').classList.add('hidden');
+            document.getElementById('mode-display').innerText = 'PRACTICE (wrong)';
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('prevBtn').disabled = true;
+            quizActive = true;
+            startTime = Date.now();
+            timeUsed = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            renderPracticeQuestion();
+        };
+
+        window.resetStat = function(topicKey) {
+            let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
+            delete stats[topicKey];
+            localStorage.setItem('quizStats', JSON.stringify(stats));
+            displayHomeStats();
+        };
+
+        function shuffleArray(arr) {
+            let a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        window.toggleTheme = function() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        };
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+
+        window.confirmQuit = function() { if (confirm('Quit quiz?')) location.reload(); };
+
+        function displayHomeStats() {
+            let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
+            let html = '<ul>';
+            for (let topic in stats) {
+                let s = stats[topic];
+                let acc = s.total ? ((s.correct/s.total)*100).toFixed(1) : 0;
+                let topicEsc = encodeURIComponent(topic);
+                html += `<li>
+                    <span class="stat-info"><strong>${topic}</strong>: ${s.correct}/${s.total} (${acc}%) – ${s.time}s</span>
+                    <button class="review-wrong-btn" onclick="reviewWrongChapter(decodeURIComponent('${topicEsc}'))">📘 Review Wrong</button>
+                    <button class="reset-btn" onclick="resetStat(decodeURIComponent('${topicEsc}'))">Reset</button>
+                </li>`;
+            }
+            html += '</ul>';
+            document.getElementById('stats-home').innerHTML = html || '<p>No data yet.</p>';
+        }
 
         function buildChapterList() {
             const container = document.getElementById('chapter-list');
@@ -1273,7 +2211,6 @@
                 const levelName = LEVEL_DISPLAY[levelKey];
                 const levelChapters = DRIVE_FILES_BY_LEVEL[levelKey] || {};
 
-                // Level heading with select/deselect buttons
                 const headingDiv = document.createElement('div');
                 headingDiv.style = 'display: flex; align-items: center; justify-content: space-between; margin: 1rem 0 0.5rem 0;';
                 const titleSpan = document.createElement('span');
@@ -1324,864 +2261,16 @@
         window.deselectAllChapters = function() {
             document.querySelectorAll('#chapter-list input[type="checkbox"]:not(:disabled)').forEach(cb => cb.checked = false);
         };
-
-        async function fetchAndStart(selectedMode) {
-            const level = document.getElementById('level-select').value;
-            const chapNum = document.getElementById('chapter-select').value;
-            const fileId = document.getElementById('topic-select').value;
-            if (!level || !chapNum || !fileId) return alert('Select level, chapter and subtopic');
-            currentChapterName = LEVEL_DISPLAY[level] + ' - ' + getChapterName(level, chapNum);
-
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('loading').classList.remove('hidden');
-            try {
-                let res = await fetch(`${APPS_SCRIPT_URL}?id=${fileId}`);
-                let raw = await res.json();
-                questions = normalizeQuestions(raw, fileId);
-                startStandardQuiz(selectedMode);
-            } catch(e) {
-                alert('Drive error: ' + e.message);
-                location.reload();
-            }
-        }
-
-        function loadLocalFile(selectedMode) {
-            const file = document.getElementById('local-file-input').files[0];
-            if (!file) return alert('Select a JSON file');
-            document.getElementById('loading').classList.remove('hidden');
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const rawData = JSON.parse(e.target.result);
-                    if (!Array.isArray(rawData)) throw new Error('Must be an array');
-                    questions = normalizeQuestions(rawData, 'local');
-                    if (!questions.length) throw new Error('No questions');
-                    currentChapterName = "Local File";
-                    document.getElementById('home-view').classList.add('hidden');
-                    document.getElementById('loading').classList.add('hidden');
-                    startStandardQuiz(selectedMode);
-                } catch (err) {
-                    document.getElementById('loading').classList.add('hidden');
-                    alert('Error: ' + err.message);
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function startStandardQuiz(selectedMode) {
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('quiz-view').classList.remove('hidden');
-            document.getElementById('result-view').classList.add('hidden');
-            document.getElementById('practice-wrong-btn').classList.remove('hidden');
-
-            if (selectedMode === 'exam') {
-                currentMode = 'standardExam';
-                document.getElementById('flashcard-ui').classList.add('hidden');
-                document.getElementById('standard-exam-ui').classList.remove('hidden');
-                document.getElementById('mode-display').innerText = 'EXAM (all at once)';
-
-                const container = document.getElementById('questions-container');
-                container.innerHTML = '';
-                userAnswers = new Array(questions.length).fill(null);
-                questions.forEach((q, i) => {
-                    let optsHtml = q.options.map((opt, idx) => `
-                        <label><input type="radio" name="q${i}" value="${idx}" onchange="saveExamAnswer(${i}, ${idx})"> ${opt}</label>
-                    `).join('');
-                    container.innerHTML += `
-                        <div class="question-card">
-                            <p><strong>${i+1}. ${q.q}</strong> ${renderStarButton(q)}</p>
-                            <div class="options-group">${optsHtml}</div>
-                        </div>`;
-                });
-
-                totalExamTime = questions.length * 60;
-                timeRemaining = totalExamTime;
-                timeUsed = 0;
-            } else {
-                currentMode = 'standardPractice';
-                document.getElementById('flashcard-ui').classList.remove('hidden');
-                document.getElementById('standard-exam-ui').classList.add('hidden');
-                document.getElementById('mode-display').innerText = 'PRACTICE (series)';
-
-                practiceAnswers = new Array(questions.length).fill(null);
-                currentIndex = 0;
-                renderPracticeQuestion();
-                document.getElementById('nextBtn').disabled = true;
-                document.getElementById('prevBtn').disabled = currentIndex === 0;
-                document.getElementById('streaming-status').innerText = '';
-                timeUsed = 0;
-            }
-
-            quizActive = true;
-            startTime = Date.now();
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(updateTimer, 1000);
-        }
-
-        window.saveExamAnswer = function(qIndex, optIndex) {
-            if (quizActive) userAnswers[qIndex] = optIndex;
+        window.selectLevel = function(levelKey) {
+            document.querySelectorAll(`#chapter-list input[type="checkbox"][id^="chap-${levelKey}-"]:not(:disabled)`).forEach(cb => cb.checked = true);
         };
-
-        function updateTimer() {
-            if (!quizActive) return;
-            if (currentMode === 'standardExam') {
-                timeRemaining--;
-                if (timeRemaining <= 0) {
-                    timeRemaining = 0;
-                    submitQuiz();
-                    return;
-                }
-                let mins = Math.floor(timeRemaining / 60);
-                let secs = timeRemaining % 60;
-                document.getElementById('timer-display').innerText = `${mins}:${secs.toString().padStart(2,'0')}`;
-                const timerEl = document.getElementById('timer-display');
-                if (timeRemaining <= 60) timerEl.className = 'timer danger';
-                else if (timeRemaining <= 300) timerEl.className = 'timer warning';
-                else timerEl.className = 'timer';
-            } else {
-                let elapsed = Math.floor((Date.now() - startTime) / 1000);
-                let mins = Math.floor(elapsed / 60), secs = elapsed % 60;
-                document.getElementById('timer-display').innerText = `${mins}:${secs.toString().padStart(2,'0')}`;
-                timeUsed = elapsed;
-            }
-        }
-
-        const motivationalMessages = [
-            "Great job! 🎉", "Keep going! 💪", "You're on fire! 🔥", "Excellent! ✨",
-            "Correct! 👍", "Nice one! 🌟", "You've got this! 🚀", "Awesome! 🏆"
-        ];
-
-        function showMotivation() {
-            const msgDiv = document.getElementById('motivation-message');
-            msgDiv.innerText = motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
-            msgDiv.classList.remove('hidden');
-            setTimeout(() => msgDiv.classList.add('hidden'), 2000);
-        }
-
-        function renderPracticeQuestion() {
-            let q = questions[currentIndex];
-            let ans = practiceAnswers[currentIndex];
-            let searchBtnHtml = `<button class="btn btn-small" onclick="searchCurrentQuestion()">🔍</button>`;
-            let starHtml = renderStarButton(q);
-            document.getElementById('question-text').innerHTML = `${currentIndex+1}. ${q.q} ${searchBtnHtml} ${starHtml}`;
-            let optsHtml = q.options.map((opt, idx) => {
-                let checked = (ans === idx) ? 'checked' : '';
-                return `<label id="opt-${idx}" class="option-label"><input type="radio" name="practice-opt" value="${idx}" ${checked} onchange="onPracticeAnswer(${idx})"> ${opt}</label>`;
-            }).join('');
-            document.getElementById('options-container').innerHTML = optsHtml;
-            document.getElementById('explanation-box').classList.add('hidden');
-            document.querySelectorAll('.option-label').forEach(el => el.classList.remove('option-correct', 'option-incorrect'));
-            let answered = practiceAnswers.filter(a => a !== null).length;
-            document.getElementById('progress-fill').style.width = (answered / questions.length * 100) + '%';
-            document.getElementById('prevBtn').disabled = currentIndex === 0;
-            const hasAnswer = practiceAnswers[currentIndex] !== null;
-            const isLast = currentIndex === questions.length - 1;
-            document.getElementById('nextBtn').disabled = isLast || !hasAnswer;
-        }
-
-        window.onPracticeAnswer = function(selectedIdx) {
-            if (!quizActive) return;
-            let q = questions[currentIndex];
-            practiceAnswers[currentIndex] = selectedIdx;
-            let correctIdx = parseInt(q.correct);
-            document.querySelectorAll('.option-label').forEach((label, idx) => {
-                label.classList.remove('option-correct', 'option-incorrect');
-                if (idx === correctIdx) label.classList.add('option-correct');
-                else if (idx === selectedIdx && !isAnswerCorrect(selectedIdx, correctIdx)) label.classList.add('option-incorrect');
-            });
-            document.getElementById('explanation-box').classList.remove('hidden');
-            document.getElementById('explanation-box').innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
-            document.getElementById('nextBtn').disabled = currentIndex === questions.length - 1;
-            let answered = practiceAnswers.filter(a => a !== null).length;
-            document.getElementById('progress-fill').style.width = (answered / questions.length * 100) + '%';
-            if (isAnswerCorrect(selectedIdx, correctIdx)) showMotivation();
+        window.deselectLevel = function(levelKey) {
+            document.querySelectorAll(`#chapter-list input[type="checkbox"][id^="chap-${levelKey}-"]:not(:disabled)`).forEach(cb => cb.checked = false);
         };
-
-        window.prevQuestion = function() {
-            if (currentMode === 'standardPractice' && currentIndex > 0) {
-                currentIndex--;
-                renderPracticeQuestion();
-            } else if (currentMode === 'psycho' && currentIndex > 0) {
-                currentIndex--;
-                renderFlashcardQuestion();
-            } else if (currentMode === 'bookmarkReview' && currentIndex > 0) {
-                currentIndex--;
-                renderPracticeQuestion();
-            } else if (currentMode === 'dailyChallenge' && currentIndex > 0) {
-                currentIndex--;
-                renderPracticeQuestion();
-            }
-        };
-
-        window.nextQuestion = function() {
-            if (currentMode === 'standardPractice' && currentIndex < questions.length - 1) {
-                currentIndex++;
-                renderPracticeQuestion();
-            } else if (currentMode === 'psycho') {
-                nextFlashcard();
-            } else if (currentMode === 'bookmarkReview' && currentIndex < questions.length - 1) {
-                currentIndex++;
-                renderPracticeQuestion();
-            } else if (currentMode === 'dailyChallenge' && currentIndex < questions.length - 1) {
-                currentIndex++;
-                renderPracticeQuestion();
-            }
-        };
-
-        window.calculateExamResults = function() {
-            if (!quizActive) return;
-            quizActive = false;
-            clearInterval(timerInterval);
-            document.getElementById('quiz-view').classList.add('hidden');
-            document.getElementById('result-view').classList.remove('hidden');
-
-            let correct = 0, incorrect = 0, skipped = 0;
-            let reviewHtml = '';
-            questions.forEach((q, i) => {
-                let selected = userAnswers[i];
-                let isCorrect = isAnswerCorrect(selected, q.correct);
-                if (selected === null) skipped++;
-                else if (isCorrect) correct++;
-                else incorrect++;
-
-                let optsHtml = q.options.map((opt, idx) => {
-                    let style = "padding:0.8rem; margin:0.5rem 0; border:1px solid var(--border); border-radius:1rem;";
-                    let label = "";
-                    if (isAnswerCorrect(idx, q.correct)) {
-                        style = "padding:0.8rem; margin:0.5rem 0; border:3px solid #22c55e; border-radius:1rem; background:#dcfce7; font-weight:600;";
-                        label = " <span style='float:right'>✔</span>";
-                    } else if (idx === selected && !isCorrect) {
-                        style = "padding:0.8rem; margin:0.5rem 0; border:3px solid #ef4444; border-radius:1rem; background:#fee2e2;";
-                        label = " <span style='float:right'>✖</span>";
-                    }
-                    return `<div style="${style}">${opt}${label}</div>`;
-                }).join('');
-
-                reviewHtml += `<div class="question-card" style="border-left:12px solid ${isCorrect ? '#10b981' : '#ef4444'}">
-                    <p><strong>${i+1}. ${q.q}</strong> ${renderStarButton(q)} <button class="btn btn-small" onclick='searchQuestionFromReview("${q.q.replace(/"/g, '&quot;')}", ${JSON.stringify(q.options)})'>🔍</button></p>
-                    ${optsHtml}
-                    ${selected===null?'<p style="color:var(--danger);">⚠️ Skipped</p>':''}
-                    <div class="explanation-box">💡 ${q.explanation}</div></div>`;
-            });
-
-            let timeTaken = totalExamTime - timeRemaining;
-            displayResults(correct, incorrect, skipped, questions.length, reviewHtml, currentChapterName, timeTaken);
-            saveWrongQuestions(currentChapterName);
-            if (correct === questions.length) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        };
-
-        function finishPractice() {
-            if (!quizActive) return;
-            quizActive = false;
-            clearInterval(timerInterval);
-            document.getElementById('quiz-view').classList.add('hidden');
-            document.getElementById('result-view').classList.remove('hidden');
-
-            let correct = 0, incorrect = 0, skipped = 0;
-            questions.forEach((q, i) => {
-                let selected = practiceAnswers[i];
-                let isCorrect = isAnswerCorrect(selected, q.correct);
-                if (selected === null) skipped++;
-                else if (isCorrect) correct++;
-                else incorrect++;
-            });
-
-            let reviewHtml = '';
-            questions.forEach((q, i) => {
-                let selected = practiceAnswers[i];
-                let isCorrect = isAnswerCorrect(selected, q.correct);
-                let optsHtml = q.options.map((opt, idx) => {
-                    let style = "padding:0.8rem; margin:0.5rem 0; border:1px solid var(--border); border-radius:1rem;";
-                    let label = "";
-                    if (isAnswerCorrect(idx, q.correct)) {
-                        style = "padding:0.8rem; margin:0.5rem 0; border:3px solid #22c55e; border-radius:1rem; background:#dcfce7; font-weight:600;";
-                        label = " <span style='float:right'>✔</span>";
-                    } else if (idx === selected && !isCorrect) {
-                        style = "padding:0.8rem; margin:0.5rem 0; border:3px solid #ef4444; border-radius:1rem; background:#fee2e2;";
-                        label = " <span style='float:right'>✖</span>";
-                    }
-                    return `<div style="${style}">${opt}${label}</div>`;
-                }).join('');
-
-                reviewHtml += `<div class="question-card" style="border-left:12px solid ${isCorrect ? '#10b981' : '#ef4444'}">
-                    <p><strong>${i+1}. ${q.q}</strong> ${renderStarButton(q)} <button class="btn btn-small" onclick='searchQuestionFromReview("${q.q.replace(/"/g, '&quot;')}", ${JSON.stringify(q.options)})'>🔍</button></p>
-                    ${optsHtml}
-                    ${selected===null?'<p style="color:var(--danger);">⚠️ Skipped</p>':''}
-                    <div class="explanation-box">💡 ${q.explanation}</div></div>`;
-            });
-
-            displayResults(correct, incorrect, skipped, questions.length, reviewHtml, currentChapterName, timeUsed);
-            saveWrongQuestions(currentChapterName);
-            if (correct === questions.length) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        }
-
-        function displayResults(correct, incorrect, skipped, total, reviewHtml, topicName, timeSpent) {
-            document.getElementById('stat-correct').innerText = correct;
-            document.getElementById('stat-incorrect').innerText = incorrect;
-            document.getElementById('stat-skipped').innerText = skipped;
-            document.getElementById('stat-time').innerText = timeSpent + 's';
-            document.getElementById('final-score').innerHTML = `${correct} <span style="font-size:2rem;">/ ${total}</span>`;
-            document.getElementById('review-container').innerHTML = reviewHtml;
-
-            let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
-            if (!stats[topicName]) stats[topicName] = { total:0, correct:0, time:0 };
-            stats[topicName].total += total;
-            stats[topicName].correct += correct;
-            stats[topicName].time += timeSpent;
-            localStorage.setItem('quizStats', JSON.stringify(stats));
-            displayHomeStats();
-        }
-
-        function saveWrongQuestions(topicName) {
-            let wrong = [];
-            questions.forEach((q, i) => {
-                let selected = (currentMode === 'standardExam') ? userAnswers[i] : practiceAnswers[i];
-                if (selected !== null && !isAnswerCorrect(selected, q.correct)) {
-                    wrong.push(q);
-                }
-            });
-            if (wrong.length > 0) {
-                wrongQuestionsByChapter[topicName] = wrong;
-                localStorage.setItem('wrongQuestionsByChapter', JSON.stringify(wrongQuestionsByChapter));
-            }
-        }
-
-        async function startPsychoFlashcard() {
-            const checkboxes = document.querySelectorAll('#chapter-list input[type="checkbox"]:checked:not(:disabled)');
-            const selected = Array.from(checkboxes).map(cb => cb.value);
-            if (!selected.length) return alert('Select at least one chapter with questions');
-            let fileIds = [];
-            for (let val of selected) {
-                let [levelKey, chapNum] = val.split('|');
-                let subtopics = DRIVE_FILES_BY_LEVEL[levelKey]?.[chapNum] || {};
-                for (let fid of Object.values(subtopics)) if (fid && fid.trim()) fileIds.push(fid);
-            }
-            if (!fileIds.length) return alert('No valid file IDs');
-            document.getElementById('psychoBtn').disabled = true;
-            document.getElementById('psychoProgress').innerText = 'Preparing...';
-            fileQueue = shuffleArray(fileIds);
-            loadedQuestions = []; recentFileIds = []; shownQuestions = []; shownAnswers = [];
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('quiz-view').classList.remove('hidden');
-            document.getElementById('flashcard-ui').classList.remove('hidden');
-            document.getElementById('standard-exam-ui').classList.add('hidden');
-            document.getElementById('result-view').classList.add('hidden');
-            document.getElementById('practice-wrong-btn').classList.remove('hidden');
-            currentMode = 'psycho';
-            currentChapterName = 'Psycho Flashcard';
-            quizActive = true;
-            startTime = Date.now();
-            timeUsed = 0;
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(updateTimer, 1000);
-            document.getElementById('mode-display').innerText = 'PSYCHO FLASHCARD';
-            document.getElementById('nextBtn').disabled = true;
-            document.getElementById('streaming-status').innerText = 'Loading...';
-            isFetching = true;
-            let filesToFetch = Math.min(initialBatchSize, fileQueue.length);
-            for (let i = 0; i < filesToFetch; i++) await fetchOneFileAndAddToPool();
-            isFetching = false;
-            if (!loadedQuestions.length) {
-                alert('No questions loaded');
-                document.getElementById('home-view').classList.remove('hidden');
-                document.getElementById('quiz-view').classList.add('hidden');
-                document.getElementById('psychoBtn').disabled = false;
-                document.getElementById('psychoProgress').innerText = '';
-                return;
-            }
-            let firstQ = pickQuestionFromPool();
-            if (firstQ) showFlashcardQuestion(firstQ);
-            document.getElementById('psychoBtn').disabled = false;
-            document.getElementById('streaming-status').innerText = `Pool: ${loadedQuestions.length}`;
-        }
-
-        async function fetchOneFileAndAddToPool() {
-            if (!fileQueue.length) return;
-            const fileId = fileQueue.shift();
-            try {
-                let res = await fetch(`${APPS_SCRIPT_URL}?id=${fileId}`);
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                let qs = await res.json();
-                loadedQuestions.push(...normalizeQuestions(qs, fileId));
-            } catch (e) { console.warn('Failed', fileId); }
-        }
-
-        function pickQuestionFromPool() {
-            if (!loadedQuestions.length) return null;
-            let available = loadedQuestions.filter(q => !recentFileIds.includes(q.fileId));
-            if (!available.length) { recentFileIds = []; available = loadedQuestions; }
-            let idx = Math.floor(Math.random() * available.length);
-            let chosen = available[idx];
-            loadedQuestions = loadedQuestions.filter(q => q !== chosen);
-            recentFileIds.push(chosen.fileId);
-            if (recentFileIds.length > RECENT_WINDOW) recentFileIds.shift();
-            return chosen;
-        }
-
-        function showFlashcardQuestion(q) {
-            shownQuestions.push(q);
-            shownAnswers.push({ selected: null, fileId: q.fileId });
-            currentIndex = shownQuestions.length - 1;
-            renderFlashcardQuestion();
-        }
-
-        function renderFlashcardQuestion() {
-            let q = shownQuestions[currentIndex];
-            let ans = shownAnswers[currentIndex];
-            let searchBtnHtml = `<button class="btn btn-small" onclick="searchCurrentQuestion()">🔍</button>`;
-            let starHtml = renderStarButton(q);
-            document.getElementById('question-text').innerHTML = `${currentIndex+1}. ${q.q} ${searchBtnHtml} ${starHtml}`;
-            let optsHtml = q.options.map((opt, idx) => {
-                let checked = (ans.selected === idx) ? 'checked' : '';
-                return `<label id="opt-${idx}" class="option-label"><input type="radio" name="flash-opt" value="${idx}" ${checked} onchange="onFlashcardAnswer(${idx})"> ${opt}</label>`;
-            }).join('');
-            document.getElementById('options-container').innerHTML = optsHtml;
-            document.getElementById('explanation-box').classList.add('hidden');
-            document.querySelectorAll('.option-label').forEach(el => el.classList.remove('option-correct', 'option-incorrect'));
-            document.getElementById('nextBtn').disabled = true;
-            let answeredCount = shownAnswers.filter(a => a.selected !== null).length;
-            document.getElementById('progress-fill').style.width = (answeredCount / shownQuestions.length * 100) + '%';
-            document.getElementById('prevBtn').disabled = currentIndex === 0;
-        }
-
-        window.onFlashcardAnswer = function(selectedIdx) {
-            let q = shownQuestions[currentIndex];
-            let ans = shownAnswers[currentIndex];
-            ans.selected = selectedIdx;
-            let correctIdx = parseInt(q.correct);
-            document.querySelectorAll('.option-label').forEach((label, idx) => {
-                label.classList.remove('option-correct', 'option-incorrect');
-                if (idx === correctIdx) label.classList.add('option-correct');
-                else if (idx === selectedIdx && !isAnswerCorrect(selectedIdx, correctIdx)) label.classList.add('option-incorrect');
-            });
-            document.getElementById('explanation-box').classList.remove('hidden');
-            document.getElementById('explanation-box').innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
-            document.getElementById('nextBtn').disabled = false;
-            let answeredCount = shownAnswers.filter(a => a.selected !== null).length;
-            document.getElementById('progress-fill').style.width = (answeredCount / shownQuestions.length * 100) + '%';
-            maybeFetchNextFile();
-            if (isAnswerCorrect(selectedIdx, correctIdx)) showMotivation();
-        };
-
-        async function nextFlashcard() {
-            document.getElementById('nextBtn').disabled = true;
-            let nextQ = pickQuestionFromPool();
-            if (nextQ) showFlashcardQuestion(nextQ);
-            else if (fileQueue.length && !isFetching) {
-                isFetching = true;
-                document.getElementById('streaming-status').innerText = 'Fetching...';
-                await fetchOneFileAndAddToPool();
-                isFetching = false;
-                nextQ = pickQuestionFromPool();
-                if (nextQ) showFlashcardQuestion(nextQ);
-                else document.getElementById('question-text').innerText = 'No more questions.';
-            } else document.getElementById('question-text').innerText = 'No more questions.';
-        }
-
-        async function maybeFetchNextFile() {
-            if (isFetching || !fileQueue.length) return;
-            isFetching = true;
-            document.getElementById('streaming-status').innerText = 'Background...';
-            await fetchOneFileAndAddToPool();
-            isFetching = false;
-            document.getElementById('streaming-status').innerText = `Pool: ${loadedQuestions.length}`;
-        }
-
-        function submitPsychoResults() {
-            let correct = 0, incorrect = 0, skipped = 0, reviewHtml = '';
-            shownQuestions.forEach((q, i) => {
-                let selected = shownAnswers[i]?.selected;
-                let isCorrect = isAnswerCorrect(selected, q.correct);
-                if (selected === null) skipped++;
-                else if (isCorrect) correct++;
-                else incorrect++;
-                let optsHtml = q.options.map((opt, idx) => {
-                    let style = "padding:0.8rem; margin:0.5rem 0; border:1px solid var(--border); border-radius:1rem;";
-                    let label = "";
-                    if (isAnswerCorrect(idx, q.correct)) {
-                        style = "padding:0.8rem; margin:0.5rem 0; border:3px solid #22c55e; border-radius:1rem; background:#dcfce7; font-weight:600;";
-                        label = " <span style='float:right'>✔</span>";
-                    } else if (idx === selected && !isCorrect) {
-                        style = "padding:0.8rem; margin:0.5rem 0; border:3px solid #ef4444; border-radius:1rem; background:#fee2e2;";
-                        label = " <span style='float:right'>✖</span>";
-                    }
-                    return `<div style="${style}">${opt}${label}</div>`;
-                }).join('');
-
-                reviewHtml += `<div class="question-card" style="border-left:12px solid ${isCorrect ? '#10b981' : '#ef4444'}">
-                    <p><strong>${i+1}. ${q.q}</strong> ${renderStarButton(q)} <button class="btn btn-small" onclick='searchQuestionFromReview("${q.q.replace(/"/g, '&quot;')}", ${JSON.stringify(q.options)})'>🔍</button></p>
-                    ${optsHtml}
-                    ${selected===null?'<p style="color:var(--danger);">⚠️ Skipped</p>':''}
-                    <div class="explanation-box">💡 ${q.explanation}</div></div>`;
-            });
-            displayResults(correct, incorrect, skipped, shownQuestions.length, reviewHtml, 'Psycho Flashcard', timeUsed);
-            saveWrongQuestions('Psycho Flashcard');
-            if (correct === shownQuestions.length) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-
-            quizActive = false;
-            clearInterval(timerInterval);
-            document.getElementById('quiz-view').classList.add('hidden');
-            document.getElementById('result-view').classList.remove('hidden');
-        }
-
-        async function startPsychoExam() {
-            const checkboxes = document.querySelectorAll('#chapter-list input[type="checkbox"]:checked:not(:disabled)');
-            const selected = Array.from(checkboxes).map(cb => cb.value);
-            if (!selected.length) return alert('Select at least one chapter with questions');
-            let fileIds = [];
-            for (let val of selected) {
-                let [levelKey, chapNum] = val.split('|');
-                let subtopics = DRIVE_FILES_BY_LEVEL[levelKey]?.[chapNum] || {};
-                for (let fid of Object.values(subtopics)) if (fid && fid.trim()) fileIds.push(fid);
-            }
-            if (!fileIds.length) return alert('No valid file IDs');
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('loading').classList.remove('hidden');
-            document.getElementById('loading').innerHTML = 'Fetching questions... <span id="fetch-progress">0/0</span>';
-            let allQuestions = [];
-            const totalFiles = fileIds.length;
-            let fetchedCount = 0;
-            const updateProgress = () => {
-                const span = document.getElementById('fetch-progress');
-                if (span) span.innerText = `${fetchedCount}/${totalFiles}`;
-            };
-            updateProgress();
-            for (let fileId of fileIds) {
-                try {
-                    let res = await fetch(`${APPS_SCRIPT_URL}?id=${fileId}`);
-                    if (res.ok) allQuestions.push(...normalizeQuestions(await res.json(), fileId));
-                } catch (e) { console.warn('Failed', fileId); }
-                fetchedCount++;
-                updateProgress();
-            }
-            if (!allQuestions.length) {
-                alert('No questions loaded');
-                document.getElementById('home-view').classList.remove('hidden');
-                document.getElementById('loading').classList.add('hidden');
-                return;
-            }
-            allQuestions = shuffleArray(allQuestions);
-            questions = allQuestions.slice(0, 100);
-            currentChapterName = 'Psycho Exam (100 random)';
-            currentMode = 'standardExam';
-            document.getElementById('loading').classList.add('hidden');
-            startStandardQuiz('exam');
-        }
-
-        function startBookmarkReview() {
-            loadBookmarks();
-            if (bookmarks.length === 0) {
-                alert('You have no bookmarked questions.');
-                return;
-            }
-            questions = bookmarks.map(q => ({ ...q }));
-            practiceAnswers = new Array(questions.length).fill(null);
-            currentIndex = 0;
-            currentMode = 'bookmarkReview';
-            currentChapterName = 'Bookmarked Questions';
-
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('quiz-view').classList.remove('hidden');
-            document.getElementById('result-view').classList.add('hidden');
-            document.getElementById('flashcard-ui').classList.remove('hidden');
-            document.getElementById('standard-exam-ui').classList.add('hidden');
-            document.getElementById('mode-display').innerText = 'BOOKMARK REVIEW';
-            document.getElementById('nextBtn').disabled = true;
-            document.getElementById('prevBtn').disabled = true;
-            document.getElementById('streaming-status').innerText = '';
-            quizActive = true;
-            startTime = Date.now();
-            timeUsed = 0;
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(updateTimer, 1000);
-            renderPracticeQuestion();
-        }
-
-        // ========== DAILY CHALLENGE – PRE‑GENERATED AND STORED ==========
-
-        async function generateDailySet() {
-            const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-            const stored = localStorage.getItem('dailySet');
-            if (stored) {
-                try {
-                    const parsed = JSON.parse(stored);
-                    if (parsed.date === today && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
-                        return; // already have today's set
-                    }
-                } catch (e) {}
-            }
-
-            let allFileIds = [];
-            for (let level of ['level7', 'gk']) {
-                let chapters = DRIVE_FILES_BY_LEVEL[level];
-                for (let chap in chapters) {
-                    for (let fid of Object.values(chapters[chap])) {
-                        if (fid && fid.trim()) allFileIds.push(fid);
-                    }
-                }
-            }
-            if (allFileIds.length === 0) return;
-
-            const seed = parseInt(today.split('-').join(''), 10);
-            const rng = mulberry32(seed);
-            const shuffled = shuffleArraySeeded(allFileIds, rng);
-            const selectedFileIds = shuffled.slice(0, 20);
-
-            let dailyQuestions = [];
-            for (let fid of selectedFileIds) {
-                try {
-                    let res = await fetch(`${APPS_SCRIPT_URL}?id=${fid}`);
-                    if (res.ok) {
-                        let qs = await res.json();
-                        let normalized = normalizeQuestions(qs, fid);
-                        if (normalized.length > 0) {
-                            let idx = Math.floor(rng() * normalized.length);
-                            dailyQuestions.push(normalized[idx]);
-                        }
-                    }
-                } catch (e) { console.warn('Failed', fid); }
-            }
-            if (dailyQuestions.length > 0) {
-                localStorage.setItem('dailySet', JSON.stringify({
-                    date: today,
-                    questions: dailyQuestions
-                }));
-            }
-        }
-
-        async function startDailyChallenge() {
-            const today = new Date().toISOString().slice(0, 10);
-            const stored = localStorage.getItem('dailySet');
-            let dailyQuestions = null;
-            if (stored) {
-                try {
-                    const parsed = JSON.parse(stored);
-                    if (parsed.date === today && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
-                        dailyQuestions = parsed.questions;
-                    }
-                } catch (e) {}
-            }
-
-            if (!dailyQuestions) {
-                document.getElementById('daily-progress').innerText = 'Generating today\'s set, please wait...';
-                await generateDailySet();
-                const newStored = localStorage.getItem('dailySet');
-                if (newStored) {
-                    try {
-                        dailyQuestions = JSON.parse(newStored).questions;
-                    } catch (e) {}
-                }
-                document.getElementById('daily-progress').innerText = '';
-            }
-
-            if (!dailyQuestions || dailyQuestions.length === 0) {
-                alert('Failed to load daily questions. Please try again later.');
-                return;
-            }
-
-            questions = dailyQuestions.map(q => ({ ...q }));
-            practiceAnswers = new Array(questions.length).fill(null);
-            currentIndex = 0;
-            currentMode = 'dailyChallenge';
-            currentChapterName = 'Aajka Sawal (Daily 20)';
-
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('quiz-view').classList.remove('hidden');
-            document.getElementById('result-view').classList.add('hidden');
-            document.getElementById('flashcard-ui').classList.remove('hidden');
-            document.getElementById('standard-exam-ui').classList.add('hidden');
-            document.getElementById('mode-display').innerText = 'DAILY CHALLENGE';
-            document.getElementById('nextBtn').disabled = true;
-            document.getElementById('prevBtn').disabled = true;
-            document.getElementById('streaming-status').innerText = '';
-            quizActive = true;
-            startTime = Date.now();
-            timeUsed = 0;
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(updateTimer, 1000);
-            renderPracticeQuestion();
-        }
-
-        setTimeout(() => {
-            generateDailySet().catch(e => console.warn('Daily generation error', e));
-        }, 1000);
-
-        function mulberry32(a) {
-            return function() {
-                a |= 0; a = a + 0x6D2B79F5 | 0;
-                let t = Math.imul(a ^ a >>> 15, 1 | a);
-                t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-                return ((t ^ t >>> 14) >>> 0) / 4294967296;
-            };
-        }
-
-        function shuffleArraySeeded(arr, rng) {
-            let a = [...arr];
-            for (let i = a.length - 1; i > 0; i--) {
-                const j = Math.floor(rng() * (i + 1));
-                [a[i], a[j]] = [a[j], a[i]];
-            }
-            return a;
-        }
-
-        window.reviewWrongChapter = function(topicName) {
-            let wrong = wrongQuestionsByChapter[topicName];
-            if (!wrong || wrong.length === 0) {
-                alert('No wrong answers recorded for this chapter yet. Complete a quiz first!');
-                return;
-            }
-            questions = wrong.map(q => ({...q}));
-            practiceAnswers = new Array(questions.length).fill(null);
-            currentIndex = 0;
-            currentMode = 'standardPractice';
-            currentChapterName = topicName + ' (wrong)';
-
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('quiz-view').classList.remove('hidden');
-            document.getElementById('result-view').classList.add('hidden');
-            document.getElementById('flashcard-ui').classList.remove('hidden');
-            document.getElementById('standard-exam-ui').classList.add('hidden');
-            document.getElementById('mode-display').innerText = 'PRACTICE (wrong)';
-            document.getElementById('nextBtn').disabled = true;
-            document.getElementById('prevBtn').disabled = true;
-            quizActive = true;
-            startTime = Date.now();
-            timeUsed = 0;
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(updateTimer, 1000);
-            renderPracticeQuestion();
-        };
-
-        window.searchCurrentQuestion = function() {
-            let questionText = '', options = [];
-            if (currentMode === 'standardPractice' && questions[currentIndex]) {
-                questionText = questions[currentIndex].q;
-                options = questions[currentIndex].options || [];
-            } else if (currentMode === 'psycho' && shownQuestions[currentIndex]) {
-                questionText = shownQuestions[currentIndex].q;
-                options = shownQuestions[currentIndex].options || [];
-            } else if (currentMode === 'bookmarkReview' && questions[currentIndex]) {
-                questionText = questions[currentIndex].q;
-                options = questions[currentIndex].options || [];
-            } else if (currentMode === 'dailyChallenge' && questions[currentIndex]) {
-                questionText = questions[currentIndex].q;
-                options = questions[currentIndex].options || [];
-            } else return;
-            let query = questionText + (options.length ? ' ' + options.join(' ') : '');
-            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
-        };
-
-        window.searchQuestionFromReview = function(questionText, options) {
-            let query = questionText + (options && options.length ? ' ' + options.join(' ') : '');
-            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
-        };
-
-        window.submitQuiz = function() {
-            if (!quizActive) return;
-            if (currentMode === 'standardExam') calculateExamResults();
-            else if (currentMode === 'standardPractice') finishPractice();
-            else if (currentMode === 'psycho') submitPsychoResults();
-            else if (currentMode === 'bookmarkReview') finishPractice();
-            else if (currentMode === 'dailyChallenge') finishPractice();
-        };
-
-        window.practiceWrong = function() {
-            let wrongQs, wrongAnswers, sourceChapter;
-            if (currentMode === 'standardExam') {
-                wrongQs = questions.filter((q, i) => !isAnswerCorrect(userAnswers[i], q.correct));
-                wrongAnswers = new Array(wrongQs.length).fill(null);
-                sourceChapter = currentChapterName;
-            } else if (currentMode === 'standardPractice') {
-                wrongQs = questions.filter((q, i) => !isAnswerCorrect(practiceAnswers[i], q.correct));
-                wrongAnswers = new Array(wrongQs.length).fill(null);
-                sourceChapter = currentChapterName;
-            } else if (currentMode === 'psycho') {
-                wrongQs = shownQuestions.filter((q, i) => !isAnswerCorrect(shownAnswers[i]?.selected, q.correct));
-                wrongAnswers = new Array(wrongQs.length).fill(null);
-                sourceChapter = 'Psycho Flashcard';
-            } else if (currentMode === 'bookmarkReview') {
-                wrongQs = questions.filter((q, i) => !isAnswerCorrect(practiceAnswers[i], q.correct));
-                wrongAnswers = new Array(wrongQs.length).fill(null);
-                sourceChapter = 'Bookmarked Questions';
-            } else if (currentMode === 'dailyChallenge') {
-                wrongQs = questions.filter((q, i) => !isAnswerCorrect(practiceAnswers[i], q.correct));
-                wrongAnswers = new Array(wrongQs.length).fill(null);
-                sourceChapter = 'Daily Challenge';
-            } else return;
-            if (!wrongQs.length) { alert('No wrong answers!'); return; }
-            questions = wrongQs.map(q => ({...q}));
-            practiceAnswers = wrongAnswers;
-            currentMode = 'standardPractice';
-            currentChapterName = sourceChapter + ' (wrong)';
-            currentIndex = 0;
-            document.getElementById('result-view').classList.add('hidden');
-            document.getElementById('quiz-view').classList.remove('hidden');
-            document.getElementById('flashcard-ui').classList.remove('hidden');
-            document.getElementById('standard-exam-ui').classList.add('hidden');
-            document.getElementById('mode-display').innerText = 'PRACTICE (wrong)';
-            document.getElementById('nextBtn').disabled = true;
-            document.getElementById('prevBtn').disabled = true;
-            quizActive = true;
-            startTime = Date.now();
-            timeUsed = 0;
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(updateTimer, 1000);
-            renderPracticeQuestion();
-        };
-
-        window.resetStat = function(topicKey) {
-            let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
-            delete stats[topicKey];
-            localStorage.setItem('quizStats', JSON.stringify(stats));
-            displayHomeStats();
-        };
-
-        function shuffleArray(arr) {
-            let a = [...arr];
-            for (let i = a.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [a[i], a[j]] = [a[j], a[i]];
-            }
-            return a;
-        }
-
-        window.toggleTheme = function() { document.body.classList.toggle('dark-mode'); };
-        window.confirmQuit = function() { if (confirm('Quit quiz?')) location.reload(); };
-        window.updateChapters = updateChapters;
-        window.updateTopics = updateTopics;
-        window.fetchAndStart = fetchAndStart;
-        window.loadLocalFile = loadLocalFile;
-        window.startPsychoFlashcard = startPsychoFlashcard;
-        window.startPsychoExam = startPsychoExam;
-        window.selectAllChapters = selectAllChapters;
-        window.deselectAllChapters = deselectAllChapters;
-        window.practiceWrong = practiceWrong;
-        window.prevQuestion = prevQuestion;
-        window.nextQuestion = nextQuestion;
-        window.onFlashcardAnswer = onFlashcardAnswer;
-        window.nextFlashcard = nextFlashcard;
-        window.resetStat = resetStat;
-        window.startBookmarkReview = startBookmarkReview;
-        window.startDailyChallenge = startDailyChallenge;
-
-        function displayHomeStats() {
-            let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
-            let html = '<ul>';
-            for (let topic in stats) {
-                let s = stats[topic];
-                let acc = s.total ? ((s.correct/s.total)*100).toFixed(1) : 0;
-                html += `<li>
-                    <span class="stat-info"><strong>${topic}</strong>: ${s.correct}/${s.total} (${acc}%) – ${s.time}s</span>
-                    <button class="review-wrong-btn" onclick="reviewWrongChapter('${topic.replace(/'/g, "\\'")}')">📘 Review Wrong</button>
-                    <button class="reset-btn" onclick="resetStat('${topic.replace(/'/g, "\\'")}')">Reset</button>
-                </li>`;
-            }
-            html += '</ul>';
-            document.getElementById('stats-home').innerHTML = html || '<p>No data yet.</p>';
-        }
 
         // Initialize
         loadBookmarks();
+        loadFlagged();
         updateChapters();
         buildChapterList();
         displayHomeStats();
