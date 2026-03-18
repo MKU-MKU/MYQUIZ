@@ -753,6 +753,18 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 8. DATA MANAGEMENT (new section with clear cache & reset) -->
+            <div class="home-section">
+                <div class="section-card">
+                    <div class="section-title"><span class="badge">⚙️</span> Data Management</div>
+                    <p style="margin-bottom:1rem;">Clear cached question files (keeps bookmarks & flagged) or reset all stored data.</p>
+                    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                        <button class="btn btn-small" onclick="clearQuestionCache()" style="background:#64748b;">🧹 Clear Question Cache</button>
+                        <button class="btn btn-small" onclick="resetAllData()" style="background:#dc2626;">⚠️ Reset All Data</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1071,6 +1083,32 @@
 
         // Cache for question files
         let questionCache = JSON.parse(localStorage.getItem('questionCache') || '{}');
+
+        // ---------- NEW: CACHE CLEAR & RESET FUNCTIONS ----------
+        window.clearQuestionCache = function() {
+            if (confirm('Clear cached question files? Your bookmarks and flagged questions will be kept.')) {
+                localStorage.removeItem('questionCache');
+                questionCache = {};
+                alert('Question cache cleared. Next load will fetch fresh data.');
+            }
+        };
+
+        window.resetAllData = function() {
+            if (confirm('⚠️ This will delete ALL your stored data:\n- Question cache\n- Bookmarks\n- Flagged questions\n- Wrong questions\n- Quiz statistics\n\nAre you absolutely sure?')) {
+                localStorage.removeItem('questionCache');
+                localStorage.removeItem('bookmarks');
+                localStorage.removeItem('flaggedQuestions');
+                localStorage.removeItem('wrongQuestionsByChapter');
+                localStorage.removeItem('quizStats');
+                // Also clear in-memory variables
+                bookmarks = [];
+                flaggedQuestions = [];
+                wrongQuestionsByChapter = {};
+                questionCache = {};
+                alert('All data has been reset. The page will now reload.');
+                location.reload();
+            }
+        };
 
         // ---------- HELPER FUNCTIONS ----------
         function loadBookmarks() { try { bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]'); } catch { bookmarks = []; } }
