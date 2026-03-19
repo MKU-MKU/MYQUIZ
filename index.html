@@ -1471,33 +1471,10 @@
             }
         }
 
-        function renderPracticeQuestion() {
-            let q = questions[currentIndex];
-            let ans = practiceAnswers[currentIndex];
-            let searchBtnHtml = `<button class="btn btn-small" onclick="searchCurrentQuestion()" aria-label="Search online">🔍</button>`;
-            let starHtml = renderStarButton(q);
-            let flagHtml = renderFlagButton(q);
-            document.getElementById('question-text').innerHTML = `${currentIndex+1}. ${q.q} ${searchBtnHtml} ${starHtml} ${flagHtml}`;
-            let optsHtml = q.options.map((opt, idx) => {
-                let checked = (ans === idx) ? 'checked' : '';
-                return `<label id="opt-${idx}" class="option-label"><input type="radio" name="practice-opt" value="${idx}" ${checked} onchange="onPracticeAnswer(${idx})"> ${opt}</label>`;
-            }).join('');
-            document.getElementById('options-container').innerHTML = optsHtml;
-            document.getElementById('explanation-box').classList.add('hidden');
-            document.querySelectorAll('.option-label').forEach(el => el.classList.remove('option-correct', 'option-incorrect'));
-            let answered = practiceAnswers.filter(a => a !== null).length;
-            document.getElementById('progress-fill').style.width = (answered / questions.length * 100) + '%';
-            document.getElementById('prevBtn').disabled = currentIndex === 0;
-            // Next will be enabled after answering
-            document.getElementById('nextBtn').disabled = true;
-            updateFlagButton(q.uid);
-            updateStarButton(q.uid);
-        }
-
-        window.onPracticeAnswer = function(selectedIdx) {
-            if (!quizActive) return;
-            practiceAnswers[currentIndex] = selectedIdx;
-            let q = questions[currentIndex];
+        // Helper to apply answer feedback (highlight correct/incorrect, show explanation)
+        function applyAnswerFeedback(qIndex, selectedIdx) {
+            if (selectedIdx === null || selectedIdx === undefined) return;
+            let q = questions[qIndex];
             let correctIdx = parseInt(q.correct);
             document.querySelectorAll('.option-label').forEach((label, idx) => {
                 label.classList.remove('option-correct', 'option-incorrect');
@@ -1507,12 +1484,69 @@
             document.getElementById('explanation-box').classList.remove('hidden');
             document.getElementById('explanation-box').innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
 
-            let isCorrect = isAnswerCorrect(selectedIdx, correctIdx);
+            const isLast = qIndex === questions.length - 1;
+            document.getElementById('nextBtn').disabled = isLast;
+        }
+
+        // Render a question in practice mode (with locking if already answered)
+        function renderPracticeQuestion() {
+            let q = questions[currentIndex];
+            let ans = practiceAnswers[currentIndex];
+            let searchBtnHtml = `<button class="btn btn-small" onclick="searchCurrentQuestion()" aria-label="Search online">🔍</button>`;
+            let starHtml = renderStarButton(q);
+            let flagHtml = renderFlagButton(q);
+            document.getElementById('question-text').innerHTML = `${currentIndex+1}. ${q.q} ${searchBtnHtml} ${starHtml} ${flagHtml}`;
+
+            // Determine if radios should be disabled (answer exists and mode is not exam)
+            let disabledAttr = (currentMode !== 'standardExam' && ans !== null) ? 'disabled' : '';
+
+            let optsHtml = q.options.map((opt, idx) => {
+                let checked = (ans === idx) ? 'checked' : '';
+                return `<label id="opt-${idx}" class="option-label">
+                            <input type="radio" name="practice-opt" value="${idx}" ${checked} ${disabledAttr} onchange="onPracticeAnswer(${idx})"> ${opt}
+                        </label>`;
+            }).join('');
+
+            document.getElementById('options-container').innerHTML = optsHtml;
+            document.getElementById('explanation-box').classList.add('hidden');
+            document.querySelectorAll('.option-label').forEach(el => el.classList.remove('option-correct', 'option-incorrect'));
+
+            let answered = practiceAnswers.filter(a => a !== null).length;
+            document.getElementById('progress-fill').style.width = (answered / questions.length * 100) + '%';
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+
+            // If there's already an answer, show feedback and enable Next (if not last)
+            if (ans !== null) {
+                applyAnswerFeedback(currentIndex, ans);
+            } else {
+                document.getElementById('nextBtn').disabled = true;
+            }
+
+            updateFlagButton(q.uid);
+            updateStarButton(q.uid);
+        }
+
+        // Handle answer selection in practice mode
+        window.onPracticeAnswer = function(selectedIdx) {
+            if (!quizActive) return;
+            // If answer already exists and mode is not exam, ignore further clicks
+            if (currentMode !== 'standardExam' && practiceAnswers[currentIndex] !== null) {
+                return; // Already answered – ignore change
+            }
+
+            practiceAnswers[currentIndex] = selectedIdx;
+            let q = questions[currentIndex];
+            let isCorrect = isAnswerCorrect(selectedIdx, parseInt(q.correct));
             practiceResults[currentIndex] = isCorrect;
             updateCounters();
+            applyAnswerFeedback(currentIndex, selectedIdx);
 
-            const isLast = currentIndex === questions.length - 1;
-            document.getElementById('nextBtn').disabled = isLast;
+            // Disable all radios for this question (if not exam mode)
+            if (currentMode !== 'standardExam') {
+                document.querySelectorAll('#options-container input[type="radio"]').forEach(radio => {
+                    radio.disabled = true;
+                });
+            }
         };
 
         window.prevQuestion = function() {
