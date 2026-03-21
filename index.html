@@ -630,7 +630,7 @@
 
 <script>
     // =========================================================================
-    // HAMRO AFNAI – Complete Implementation with all requested features
+    // HAMRO AFNAI – Complete Implementation with Enhanced Daily Challenge
     // =========================================================================
     (function(){
         // ---------- CONFIGURATION ----------
@@ -641,7 +641,8 @@
             MAX_PSYCHO_EXAM_QUESTIONS: 100,
             DAILY_QUESTIONS_COUNT: 20,
             INITIAL_BATCH_SIZE: 5,
-            RECENT_WINDOW: 7
+            RECENT_WINDOW: 7,
+            DAILY_CACHE_KEY: 'dailySet'
         };
 
         // ---------- DATA MODELS ----------
@@ -707,8 +708,14 @@
 
         // Psycho streaming state
         let psychoStream = {
-            fileQueue: [], loadedPool: [], recentFileIds: [],
-            isFetching: false, shownQuestions: [], shownAnswers: []
+            fileQueue: [],
+            loadedPool: [],
+            fileCycle: [],
+            cycleIndex: 0,
+            shownQuestions: [],
+            shownAnswers: [],
+            isFetching: false,
+            loadingAll: false
         };
 
         // ---------- UTILITY FUNCTIONS ----------
@@ -844,9 +851,7 @@
         function updateChapterOrder(chapterName) {
             if (!chapterName) return;
             let order = JSON.parse(localStorage.getItem('chapterOrder') || '[]');
-            // Remove if exists
             order = order.filter(name => name !== chapterName);
-            // Add to front
             order.unshift(chapterName);
             localStorage.setItem('chapterOrder', JSON.stringify(order));
             chapterOrder = order;
@@ -857,7 +862,6 @@
             let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
             let order = JSON.parse(localStorage.getItem('chapterOrder') || '[]');
             let html = '<ul class="stat-list">';
-            // Show chapters in order of last activity
             for (let topic of order) {
                 let s = stats[topic];
                 if (!s) continue;
@@ -870,7 +874,6 @@
                             </span>
                         </li>`;
             }
-            // Also include any chapters that are in stats but not in order (should not happen, but safe)
             for (let topic in stats) {
                 if (!order.includes(topic)) {
                     let s = stats[topic];
@@ -964,12 +967,12 @@
 
         function submitQuiz() {
             if (!appState.quizActive) return;
-            if (appState.currentMode === 'standardExam') finishAndShowResults(appState.questions, appState.userAnswers);
-            else if (appState.currentMode === 'standardPractice') finishAndShowResults(appState.questions, appState.practiceAnswers);
-            else if (appState.currentMode === 'psycho') finishAndShowResults(psychoStream.shownQuestions, psychoStream.shownAnswers.map(a => a.selected));
+            if (appState.currentMode === 'standardExam') finishAndShowResults(appState.questions, appState.userAnswers, false);
+            else if (appState.currentMode === 'standardPractice') finishAndShowResults(appState.questions, appState.practiceAnswers, false);
+            else if (appState.currentMode === 'psycho') finishAndShowResults(psychoStream.shownQuestions, psychoStream.shownAnswers.map(a => a.selected), true);
         }
 
-        function finishAndShowResults(qs, answers) {
+        function finishAndShowResults(qs, answers, isPsycho = false) {
             appState.quizActive = false;
             if (appState.timerInterval) clearInterval(appState.timerInterval);
 
@@ -984,11 +987,9 @@
                 else if (selected !== null && !isCor) incorrect++;
                 else skipped++;
 
-                // Card border colour
                 let borderColor = isCor ? '#2d7a5a' : (isSkipped ? '#3498db' : '#b85e3a');
                 let cardStyle = `border-left: 5px solid ${borderColor};`;
 
-                // Build options using the same structure as practice mode
                 let optsHtml = '';
                 q.options.forEach((opt, idx) => {
                     let isCorrect = (idx == q.correct);
@@ -1023,12 +1024,27 @@
             document.getElementById('stat-incorrect').innerText = incorrect;
             document.getElementById('stat-skipped').innerText = skipped;
             document.getElementById('stat-time').innerText = appState.timeUsed + 's';
-            document.getElementById('final-score').innerHTML = `${correct} / ${qs.length}`;
+
+            const denominator = isPsycho ? (correct + incorrect) : qs.length;
+            document.getElementById('final-score').innerHTML = `${correct} <span style="font-size:2rem;">/ ${denominator}</span>`;
+            if (isPsycho) {
+                let labelSpan = document.querySelector('#final-score + div');
+                if (!labelSpan) {
+                    labelSpan = document.createElement('div');
+                    document.querySelector('#final-score').parentNode.appendChild(labelSpan);
+                }
+                labelSpan.style.fontSize = '1rem';
+                labelSpan.style.marginTop = '0.5rem';
+                labelSpan.innerText = `${correct} correct out of ${correct + incorrect} attempted`;
+            } else {
+                let existing = document.querySelector('#final-score + div');
+                if (existing && existing.innerText.includes('attempted')) existing.remove();
+            }
+
             document.getElementById('review-container').innerHTML = reviewHtml;
             document.getElementById('quiz-view').classList.add('hidden');
             document.getElementById('result-view').classList.remove('hidden');
 
-            // Update stats
             let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
             if (!stats[appState.currentChapterName]) stats[appState.currentChapterName] = { total: 0, correct: 0, time: 0 };
             stats[appState.currentChapterName].total += qs.length;
@@ -1167,26 +1183,80 @@
             if (!psychoStream.fileQueue.length) return;
             const fileId = psychoStream.fileQueue.shift();
             try {
-                let raw = await fetchWithCache(fileId);
-                if (raw) {
-                    let qs = normalizeQuestions(raw, fileId);
-                    psychoStream.loadedPool.push(...qs);
+                const raw = await fetchWithCache(fileId);
+                if (raw && Array.isArray(raw)) {
+                    const qs = normalizeQuestions(raw, fileId);
+                    if (qs.length) {
+                        psychoStream.loadedPool.push(...qs);
+                        if (!psychoStream.fileCycle.includes(fileId)) {
+                            psychoStream.fileCycle.push(fileId);
+                        }
+                    }
                 }
-            } catch (e) { console.warn(e); }
+            } catch (e) {
+                console.warn('Failed to load', fileId, e);
+            }
+        }
+
+        async function loadAllRemainingFiles() {
+            if (psychoStream.loadingAll) return;
+            psychoStream.loadingAll = true;
+            while (psychoStream.fileQueue.length) {
+                if (!psychoStream.isFetching) {
+                    psychoStream.isFetching = true;
+                    await fetchOneFileToPool();
+                    psychoStream.isFetching = false;
+                    document.getElementById('streaming-status').innerText = `📚 Loaded: ${psychoStream.loadedPool.length} questions from ${psychoStream.fileCycle.length} files`;
+                } else {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+            }
+            psychoStream.loadingAll = false;
+            document.getElementById('streaming-status').innerText = `✅ All files loaded – ${psychoStream.loadedPool.length} total questions`;
+        }
+
+        function updateFileCycle() {
+            const loadedFileIds = new Set(psychoStream.loadedPool.map(q => q.fileId));
+            psychoStream.fileCycle = psychoStream.fileCycle.filter(fid => loadedFileIds.has(fid));
+            for (let fid of loadedFileIds) {
+                if (!psychoStream.fileCycle.includes(fid)) {
+                    psychoStream.fileCycle.push(fid);
+                }
+            }
+            if (psychoStream.cycleIndex >= psychoStream.fileCycle.length) {
+                psychoStream.cycleIndex = 0;
+            }
         }
 
         function pickQuestionFromPool() {
             if (!psychoStream.loadedPool.length) return null;
-            let available = psychoStream.loadedPool.filter(q => !psychoStream.recentFileIds.includes(q.fileId));
-            if (!available.length) {
-                psychoStream.recentFileIds = [];
-                available = psychoStream.loadedPool;
+
+            if (psychoStream.fileCycle.length === 0) {
+                const idx = Math.floor(Math.random() * psychoStream.loadedPool.length);
+                const chosen = psychoStream.loadedPool[idx];
+                psychoStream.loadedPool.splice(idx, 1);
+                return chosen;
             }
-            let idx = Math.floor(Math.random() * available.length);
-            let chosen = available[idx];
-            psychoStream.loadedPool = psychoStream.loadedPool.filter(q => q !== chosen);
-            psychoStream.recentFileIds.push(chosen.fileId);
-            if (psychoStream.recentFileIds.length > CONFIG.RECENT_WINDOW) psychoStream.recentFileIds.shift();
+
+            const targetFile = psychoStream.fileCycle[psychoStream.cycleIndex];
+            psychoStream.cycleIndex = (psychoStream.cycleIndex + 1) % psychoStream.fileCycle.length;
+
+            const candidates = psychoStream.loadedPool.filter(q => q.fileId === targetFile);
+            if (candidates.length === 0) {
+                psychoStream.fileCycle = psychoStream.fileCycle.filter(fid => fid !== targetFile);
+                if (psychoStream.fileCycle.length === 0) {
+                    const idx = Math.floor(Math.random() * psychoStream.loadedPool.length);
+                    const chosen = psychoStream.loadedPool[idx];
+                    psychoStream.loadedPool.splice(idx, 1);
+                    return chosen;
+                }
+                return pickQuestionFromPool();
+            }
+
+            const randomIndex = Math.floor(Math.random() * candidates.length);
+            const chosen = candidates[randomIndex];
+            const pos = psychoStream.loadedPool.indexOf(chosen);
+            psychoStream.loadedPool.splice(pos, 1);
             return chosen;
         }
 
@@ -1247,19 +1317,7 @@
             let answeredCount = psychoStream.shownAnswers.filter(a => a.selected !== null).length;
             document.getElementById('progress-fill').style.width = (answeredCount / totalShown * 100) + '%';
             document.getElementById('next-btn').disabled = false;
-            maybeFetchNextPsychoFile();
         };
-
-        async function maybeFetchNextPsychoFile() {
-            if (psychoStream.isFetching || !psychoStream.fileQueue.length) return;
-            if (psychoStream.loadedPool.length < 3) {
-                psychoStream.isFetching = true;
-                document.getElementById('streaming-status').innerText = '📡 Loading more...';
-                await fetchOneFileToPool();
-                psychoStream.isFetching = false;
-                document.getElementById('streaming-status').innerText = `📚 ${psychoStream.loadedPool.length} in pool`;
-            }
-        }
 
         async function nextFlashcard() {
             if (appState.currentIndex < psychoStream.shownQuestions.length - 1) {
@@ -1267,31 +1325,19 @@
                 renderPsychoQuestion();
                 return;
             }
+
             document.getElementById('next-btn').disabled = true;
-            let nextQ = pickQuestionFromPool();
+            const nextQ = pickQuestionFromPool();
             if (nextQ) {
                 showFlashcardQuestion(nextQ);
-            } else if (psychoStream.fileQueue.length && !psychoStream.isFetching) {
-                psychoStream.isFetching = true;
-                document.getElementById('streaming-status').innerText = '📡 Loading more...';
-                await fetchOneFileToPool();
-                psychoStream.isFetching = false;
-                nextQ = pickQuestionFromPool();
-                if (nextQ) showFlashcardQuestion(nextQ);
-                else {
-                    let samples = getSampleQuestions();
-                    psychoStream.loadedPool.push(...samples);
-                    nextQ = pickQuestionFromPool();
-                    if (nextQ) showFlashcardQuestion(nextQ);
-                    else {
-                        document.getElementById('question-text').innerHTML = 'No more questions available.';
-                        document.getElementById('next-btn').disabled = true;
-                    }
-                    document.getElementById('streaming-status').innerText = `📚 ${psychoStream.loadedPool.length} in pool (includes samples)`;
-                }
+            } else if (psychoStream.fileQueue.length || psychoStream.loadedPool.length) {
+                setTimeout(() => {
+                    const retry = pickQuestionFromPool();
+                    if (retry) showFlashcardQuestion(retry);
+                    else document.getElementById('question-text').innerHTML = 'No more questions available.';
+                }, 500);
             } else {
                 document.getElementById('question-text').innerHTML = '🎉 You have answered all available questions!';
-                document.getElementById('next-btn').disabled = true;
             }
         }
 
@@ -1304,19 +1350,24 @@
                     psychoStream = {
                         fileQueue: [],
                         loadedPool: getSampleQuestions(),
-                        recentFileIds: [],
-                        isFetching: false,
+                        fileCycle: [],
+                        cycleIndex: 0,
                         shownQuestions: [],
-                        shownAnswers: []
+                        shownAnswers: [],
+                        isFetching: false,
+                        loadingAll: false
                     };
+                    updateFileCycle();
                 } else {
                     psychoStream = {
-                        fileQueue: shuffleArray(fileIds),
+                        fileQueue: shuffleArray([...fileIds]),
                         loadedPool: [],
-                        recentFileIds: [],
-                        isFetching: false,
+                        fileCycle: [],
+                        cycleIndex: 0,
                         shownQuestions: [],
-                        shownAnswers: []
+                        shownAnswers: [],
+                        isFetching: false,
+                        loadingAll: false
                     };
                 }
 
@@ -1359,21 +1410,27 @@
                     psychoStream.loadedPool = getSampleQuestions();
                     showToast('No real questions found. Using sample questions.', 'info');
                 }
+                updateFileCycle();
 
-                let firstQ = pickQuestionFromPool();
+                loadAllRemainingFiles();
+
+                const firstQ = pickQuestionFromPool();
                 if (firstQ) showFlashcardQuestion(firstQ);
-                document.getElementById('streaming-status').innerText = `📚 ${psychoStream.loadedPool.length} in pool`;
+                document.getElementById('streaming-status').innerText = `📚 Loaded: ${psychoStream.loadedPool.length} questions from ${psychoStream.fileCycle.length} files`;
             } catch (e) {
                 console.error(e);
                 psychoStream = {
                     fileQueue: [],
                     loadedPool: getSampleQuestions(),
-                    recentFileIds: [],
-                    isFetching: false,
+                    fileCycle: [],
+                    cycleIndex: 0,
                     shownQuestions: [],
-                    shownAnswers: []
+                    shownAnswers: [],
+                    isFetching: false,
+                    loadingAll: false
                 };
-                let firstQ = pickQuestionFromPool();
+                updateFileCycle();
+                const firstQ = pickQuestionFromPool();
                 if (firstQ) showFlashcardQuestion(firstQ);
                 document.getElementById('streaming-status').innerText = `📚 ${psychoStream.loadedPool.length} in pool (sample)`;
                 showToast('Using sample questions. Real questions unavailable.', 'info');
@@ -1412,33 +1469,125 @@
             } catch (e) { showToast('Error'); } finally { setButtonLoading(btn, false); }
         }
 
+        // Enhanced Daily Challenge (cached, resets at midnight)
         async function startDailyChallenge(btn) {
             setButtonLoading(btn, true);
-            try {
-                let fileIds = [];
-                for (let level of ['level5', 'level7', 'gk']) {
-                    for (let chap in DRIVE_FILES_BY_LEVEL[level]) {
-                        for (let fid of Object.values(DRIVE_FILES_BY_LEVEL[level][chap])) {
-                            if (fid && fid.trim()) fileIds.push(fid);
+            const today = new Date().toISOString().slice(0, 10);
+            const cached = localStorage.getItem(CONFIG.DAILY_CACHE_KEY);
+            let dailyQs = null;
+
+            // Check cache
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    if (parsed.date === today && Array.isArray(parsed.questions) && parsed.questions.length) {
+                        dailyQs = parsed.questions;
+                    }
+                } catch (e) { /* ignore */ }
+            }
+
+            if (!dailyQs) {
+                // Show status
+                const progressDiv = document.getElementById('daily-progress');
+                if (progressDiv) progressDiv.innerText = '🔄 Generating today’s set...';
+
+                try {
+                    // Collect all file IDs from all levels (skip level5 because it has only placeholders)
+                    let allFileIds = [];
+                    for (let level of ['level7', 'gk']) {
+                        for (let chap in DRIVE_FILES_BY_LEVEL[level]) {
+                            for (let fid of Object.values(DRIVE_FILES_BY_LEVEL[level][chap])) {
+                                if (fid && fid.trim()) allFileIds.push(fid);
+                            }
                         }
                     }
-                }
-                if (!fileIds.length) return;
-                let seed = new Date().toISOString().slice(0, 10).split('-').join('');
-                let rng = mulberry32(parseInt(seed, 10));
-                let shuffledIds = shuffleArraySeeded(fileIds, rng);
-                let selectedIds = shuffledIds.slice(0, CONFIG.DAILY_QUESTIONS_COUNT);
-                let dailyQs = [];
-                for (let fid of selectedIds) {
-                    let data = await fetchWithCache(fid);
-                    if (data) {
-                        let norm = normalizeQuestions(data, fid);
-                        if (norm.length) dailyQs.push(norm[Math.floor(rng() * norm.length)]);
+
+                    if (!allFileIds.length) throw new Error('No question files found');
+
+                    // Seed random with today's date
+                    const seed = parseInt(today.split('-').join(''), 10);
+                    const rng = mulberry32(seed);
+                    const shuffled = shuffleArraySeeded(allFileIds, rng);
+
+                    const targetCount = CONFIG.DAILY_QUESTIONS_COUNT;
+                    const selectedIds = [];
+                    const usedIds = new Set();
+                    let attempts = 0;
+                    const maxAttempts = targetCount * 3;
+
+                    // Keep selecting unique files until we have enough or run out of tries
+                    while (selectedIds.length < targetCount && attempts < maxAttempts && shuffled.length) {
+                        const candidate = shuffled.shift();
+                        if (!usedIds.has(candidate)) {
+                            usedIds.add(candidate);
+                            selectedIds.push(candidate);
+                        }
+                        attempts++;
                     }
+
+                    // Fetch questions
+                    const dailyQuestions = [];
+                    for (let fid of selectedIds) {
+                        const data = await fetchWithCache(fid);
+                        if (data && Array.isArray(data) && data.length) {
+                            const norm = normalizeQuestions(data, fid);
+                            if (norm.length) {
+                                const idx = Math.floor(rng() * norm.length);
+                                dailyQuestions.push(norm[idx]);
+                            }
+                        }
+                    }
+
+                    // If we have less than targetCount, try to fetch from any remaining files (including duplicates)
+                    if (dailyQuestions.length < targetCount) {
+                        const extraNeeded = targetCount - dailyQuestions.length;
+                        const extraCandidates = allFileIds.filter(fid => !selectedIds.includes(fid));
+                        for (let fid of extraCandidates) {
+                            if (dailyQuestions.length >= targetCount) break;
+                            const data = await fetchWithCache(fid);
+                            if (data && Array.isArray(data) && data.length) {
+                                const norm = normalizeQuestions(data, fid);
+                                if (norm.length) {
+                                    dailyQuestions.push(norm[Math.floor(rng() * norm.length)]);
+                                }
+                            }
+                        }
+                    }
+
+                    // Fallback to sample questions if still not enough
+                    if (dailyQuestions.length < targetCount) {
+                        const samples = getSampleQuestions();
+                        while (dailyQuestions.length < targetCount && samples.length) {
+                            dailyQuestions.push(samples.shift());
+                        }
+                    }
+
+                    if (dailyQuestions.length === 0) throw new Error('No questions could be loaded');
+
+                    // Cache the set
+                    localStorage.setItem(CONFIG.DAILY_CACHE_KEY, JSON.stringify({
+                        date: today,
+                        questions: dailyQuestions
+                    }));
+
+                    dailyQs = dailyQuestions;
+                    if (progressDiv) progressDiv.innerText = `✅ ${dailyQs.length} questions ready!`;
+                    setTimeout(() => { if (progressDiv) progressDiv.innerText = ''; }, 2000);
+                } catch (err) {
+                    console.error('Daily challenge generation failed', err);
+                    showToast('Could not generate daily set. Please try again later.');
+                    setButtonLoading(btn, false);
+                    return;
                 }
-                if (dailyQs.length) startUnifiedMode('standardPractice', dailyQs, '🌟 Daily Challenge');
-                else showToast('Daily set failed');
-            } catch (e) { showToast('Error'); } finally { setButtonLoading(btn, false); }
+            }
+
+            // Start the quiz
+            if (dailyQs && dailyQs.length) {
+                startUnifiedMode('standardPractice', dailyQs, '🌟 Daily Challenge');
+            } else {
+                showToast('Daily set is empty. Please try again.');
+            }
+            setButtonLoading(btn, false);
         }
 
         async function collectSelectedFileIds() {
@@ -1507,7 +1656,6 @@
             let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
             delete stats[topic];
             localStorage.setItem('quizStats', JSON.stringify(stats));
-            // Remove from order too
             let order = JSON.parse(localStorage.getItem('chapterOrder') || '[]');
             order = order.filter(name => name !== topic);
             localStorage.setItem('chapterOrder', JSON.stringify(order));
