@@ -29,6 +29,12 @@
             --toast-bg: #2c3e50;
             --star-active: #f5b042;
             --flag-active: #e67e22;
+            --correct-bg: #dff0d8;
+            --correct-border: #2d7a5a;
+            --incorrect-bg: #f8dddd;
+            --incorrect-border: #b85e3a;
+            --skipped-bg: #d9eaff;
+            --skipped-border: #3498db;
         }
         .dark-mode {
             --bg-page: #0e1a24;
@@ -44,6 +50,12 @@
             --toast-bg: #2c3e50;
             --star-active: #f1c40f;
             --flag-active: #e67e22;
+            --correct-bg: #1d3a2d;
+            --correct-border: #4cae4c;
+            --incorrect-bg: #592b1f;
+            --incorrect-border: #b85e3a;
+            --skipped-bg: #1f3a4d;
+            --skipped-border: #5dade2;
         }
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -337,7 +349,7 @@
             margin-bottom: 1rem;
             border-left: 5px solid var(--primary);
         }
-        .options-group label {
+        .options-group label, .options-group div {
             display: block;
             padding: 0.5rem 0.7rem;
             margin: 0.3rem 0;
@@ -347,9 +359,9 @@
             cursor: pointer;
             font-size: 0.8rem;
         }
-        .option-correct { background: #dff0d8 !important; border-color: #2d7a5a !important; }
-        .dark-mode .option-correct { background: #1d3a2d !important; border-color: #4cae4c !important; }
-        .option-incorrect { background: #f8dddd !important; border-color: #b85e3a !important; text-decoration: line-through; }
+        .option-correct { background: var(--correct-bg) !important; border-color: var(--correct-border) !important; }
+        .option-incorrect { background: var(--incorrect-bg) !important; border-color: var(--incorrect-border) !important; text-decoration: line-through; }
+        .option-skipped { background: var(--skipped-bg) !important; border-color: var(--skipped-border) !important; }
         .explanation-box {
             margin-top: 0.7rem;
             padding: 0.6rem;
@@ -442,11 +454,11 @@
                 gap: 1.2rem;
             }
             .column { display: contents; }
-            .card:nth-child(1) { order: 1; }  /* Online Study */
-            .card:nth-child(2) { order: 3; }  /* Personal */
-            .card:nth-child(3) { order: 5; }  /* Local File */
-            .card:nth-child(4) { order: 2; }  /* Smart Modes */
-            .card:nth-child(5) { order: 4; }  /* Progress */
+            .card:nth-child(1) { order: 1; }
+            .card:nth-child(2) { order: 3; }
+            .card:nth-child(3) { order: 5; }
+            .card:nth-child(4) { order: 2; }
+            .card:nth-child(5) { order: 4; }
             .dashboard-grid { display: flex; flex-direction: column; }
             .card { width: 100%; }
         }
@@ -618,7 +630,7 @@
 
 <script>
     // =========================================================================
-    // HAMRO AFNAI – Complete Implementation (All Features Working)
+    // HAMRO AFNAI – Complete Implementation with all requested features
     // =========================================================================
     (function(){
         // ---------- CONFIGURATION ----------
@@ -691,6 +703,7 @@
         let bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
         let flaggedQuestions = JSON.parse(localStorage.getItem('flaggedQuestions') || '[]');
         let questionCache = JSON.parse(localStorage.getItem('questionCache') || '{}');
+        let chapterOrder = JSON.parse(localStorage.getItem('chapterOrder') || '[]');
 
         // Psycho streaming state
         let psychoStream = {
@@ -758,7 +771,6 @@
                     <button id="flag-${uid}" class="btn-flag ${flagActive ? 'active' : ''}" onclick="window.toggleFlagFromObject('${uid}')" title="Flag (mark as difficult/wrong)">${flagActive ? '🚩' : '⚑'}</button>`;
         }
 
-        // Improved: find question by uid across both question sets
         window.toggleBookmarkFromObject = function(uid) {
             let q = null;
             if (appState.questions && Array.isArray(appState.questions)) {
@@ -826,6 +838,54 @@
                 if (btn._originalText) btn.innerHTML = btn._originalText;
                 else if (originalText) btn.innerHTML = originalText;
             }
+        }
+
+        // ---------- CHAPTER ORDER MANAGEMENT (most recent first) ----------
+        function updateChapterOrder(chapterName) {
+            if (!chapterName) return;
+            let order = JSON.parse(localStorage.getItem('chapterOrder') || '[]');
+            // Remove if exists
+            order = order.filter(name => name !== chapterName);
+            // Add to front
+            order.unshift(chapterName);
+            localStorage.setItem('chapterOrder', JSON.stringify(order));
+            chapterOrder = order;
+        }
+
+        // ---------- STATISTICS DISPLAY (ordered by most recent) ----------
+        function displayHomeStats() {
+            let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
+            let order = JSON.parse(localStorage.getItem('chapterOrder') || '[]');
+            let html = '<ul class="stat-list">';
+            // Show chapters in order of last activity
+            for (let topic of order) {
+                let s = stats[topic];
+                if (!s) continue;
+                let acc = s.total ? ((s.correct / s.total) * 100).toFixed(1) : 0;
+                html += `<li class="stat-item">
+                            <span><strong>${escapeHtml(topic)}</strong>: ${s.correct}/${s.total} (${acc}%) – ${s.time}s</span>
+                            <span class="stat-actions">
+                                <button class="review-wrong-btn" onclick="window.reviewWrongChapter('${escapeHtml(topic).replace(/'/g, "\\'")}')">📘 Review Wrong</button>
+                                <button class="reset-btn" onclick="window.resetStat('${escapeHtml(topic).replace(/'/g, "\\'")}')">Reset</button>
+                            </span>
+                        </li>`;
+            }
+            // Also include any chapters that are in stats but not in order (should not happen, but safe)
+            for (let topic in stats) {
+                if (!order.includes(topic)) {
+                    let s = stats[topic];
+                    let acc = s.total ? ((s.correct / s.total) * 100).toFixed(1) : 0;
+                    html += `<li class="stat-item">
+                                <span><strong>${escapeHtml(topic)}</strong>: ${s.correct}/${s.total} (${acc}%) – ${s.time}s</span>
+                                <span class="stat-actions">
+                                    <button class="review-wrong-btn" onclick="window.reviewWrongChapter('${escapeHtml(topic).replace(/'/g, "\\'")}')">📘 Review Wrong</button>
+                                    <button class="reset-btn" onclick="window.resetStat('${escapeHtml(topic).replace(/'/g, "\\'")}')">Reset</button>
+                                </span>
+                            </li>`;
+                }
+            }
+            html += '</ul>';
+            document.getElementById('stats-home').innerHTML = html || '<p>No data yet. Complete a quiz to see progress.</p>';
         }
 
         // ---------- CORE QUIZ FUNCTIONS ----------
@@ -914,24 +974,49 @@
             if (appState.timerInterval) clearInterval(appState.timerInterval);
 
             let correct = 0, incorrect = 0, skipped = 0, reviewHtml = '';
+
             qs.forEach((q, i) => {
-                let sel = answers[i];
-                let isCor = isAnswerCorrect(sel, q.correct);
-                if (sel === null) skipped++;
-                else if (isCor) correct++;
-                else incorrect++;
+                let selected = answers[i];
+                let isCor = selected !== null && isAnswerCorrect(selected, q.correct);
+                let isSkipped = (selected === null);
 
-                let optsHtml = q.options.map((opt, idx) => {
-                    let style = "padding:0.5rem; margin:0.3rem 0; border:1px solid var(--border-light); border-radius:1rem;";
-                    if (isAnswerCorrect(idx, q.correct)) {
-                        style = "background:#dff0d8; border:2px solid #2d7a5a; font-weight:500;";
-                    } else if (idx === sel && !isCor) {
-                        style = "background:#f8dddd; border:2px solid #b85e3a;";
-                    }
-                    return `<div style="${style}">${escapeHtml(opt)}</div>`;
-                }).join('');
+                if (selected !== null && isCor) correct++;
+                else if (selected !== null && !isCor) incorrect++;
+                else skipped++;
 
-                reviewHtml += `<div class="question-card"><p><strong>${i+1}. ${escapeHtml(q.q)}</strong> ${renderStarFlag(q)} <button class="btn-small" onclick='window.searchQuestionFromReview("${escapeHtml(q.q).replace(/"/g, '&quot;')}", ${JSON.stringify(q.options)})'>🔍</button></p>${optsHtml}${sel === null ? '<p>⚠️ Skipped</p>' : ''}<div class="explanation-box">💡 ${escapeHtml(q.explanation)}</div></div>`;
+                // Card border colour
+                let borderColor = isCor ? '#2d7a5a' : (isSkipped ? '#3498db' : '#b85e3a');
+                let cardStyle = `border-left: 5px solid ${borderColor};`;
+
+                // Build options using the same structure as practice mode
+                let optsHtml = '';
+                q.options.forEach((opt, idx) => {
+                    let isCorrect = (idx == q.correct);
+                    let isUserWrong = (selected !== null && idx === selected && !isCor);
+                    let isSkippedHighlight = (isSkipped && isCorrect);
+
+                    let classNames = [];
+                    if (isCorrect) classNames.push('option-correct');
+                    if (isUserWrong) classNames.push('option-incorrect');
+                    if (isSkippedHighlight) classNames.push('option-skipped');
+
+                    optsHtml += `<div class="${classNames.join(' ')}" style="margin:0.3rem 0; padding:0.5rem 0.7rem;">${escapeHtml(opt)}</div>`;
+                });
+
+                let skippedBadge = isSkipped ? '<span style="background: var(--skipped-bg); padding:0.2rem 0.6rem; border-radius:40px; font-size:0.7rem;">⚠️ Skipped</span>' : '';
+
+                reviewHtml += `
+                    <div class="question-card" style="${cardStyle}">
+                        <p><strong>${i+1}. ${escapeHtml(q.q)}</strong> ${renderStarFlag(q)} 
+                           <button class="btn-small" onclick='window.searchQuestionFromReview("${escapeHtml(q.q).replace(/"/g, '&quot;')}", ${JSON.stringify(q.options)})'>🔍</button>
+                           ${skippedBadge}
+                        </p>
+                        <div class="options-group">
+                            ${optsHtml}
+                        </div>
+                        <div class="explanation-box">💡 <strong>Explanation:</strong> ${escapeHtml(q.explanation)}</div>
+                    </div>
+                `;
             });
 
             document.getElementById('stat-correct').innerText = correct;
@@ -943,12 +1028,14 @@
             document.getElementById('quiz-view').classList.add('hidden');
             document.getElementById('result-view').classList.remove('hidden');
 
+            // Update stats
             let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
             if (!stats[appState.currentChapterName]) stats[appState.currentChapterName] = { total: 0, correct: 0, time: 0 };
             stats[appState.currentChapterName].total += qs.length;
             stats[appState.currentChapterName].correct += correct;
             stats[appState.currentChapterName].time += appState.timeUsed;
             localStorage.setItem('quizStats', JSON.stringify(stats));
+            updateChapterOrder(appState.currentChapterName);
             displayHomeStats();
 
             let wrongAndSkipped = qs.filter((_, i) => answers[i] === null || !isAnswerCorrect(answers[i], qs[i].correct));
@@ -1031,15 +1118,22 @@
                 currentQ = appState.questions[appState.currentIndex];
             }
             if (currentQ && currentQ.q) {
-                window.open(`https://www.google.com/search?q=${encodeURIComponent(currentQ.q)}`, '_blank');
+                let searchText = currentQ.q;
+                if (currentQ.options && currentQ.options.length) {
+                    searchText += " " + currentQ.options.join(" ");
+                }
+                window.open(`https://www.google.com/search?q=${encodeURIComponent(searchText)}`, '_blank');
             }
         };
         window.searchQuestionFromReview = function(questionText, options) {
-            window.open(`https://www.google.com/search?q=${encodeURIComponent(questionText)}`, '_blank');
+            let searchText = questionText;
+            if (options && options.length) {
+                searchText += " " + options.join(" ");
+            }
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(searchText)}`, '_blank');
         };
 
         // ---------- PSYCHO FLASHCARD (Streaming) ----------
-        // Fallback sample questions
         function getSampleQuestions() {
             return [
                 {
@@ -1185,7 +1279,6 @@
                 nextQ = pickQuestionFromPool();
                 if (nextQ) showFlashcardQuestion(nextQ);
                 else {
-                    // No real questions left, fallback to samples
                     let samples = getSampleQuestions();
                     psychoStream.loadedPool.push(...samples);
                     nextQ = pickQuestionFromPool();
@@ -1202,7 +1295,6 @@
             }
         }
 
-        // ---------- PSYCHO FLASHCARD INITIATOR (with fallback) ----------
         async function startPsychoFlashcard(btn) {
             setButtonLoading(btn, true);
             try {
@@ -1263,7 +1355,6 @@
                     psychoStream.isFetching = false;
                 }
 
-                // If still no questions, fallback to samples
                 if (!psychoStream.loadedPool.length) {
                     psychoStream.loadedPool = getSampleQuestions();
                     showToast('No real questions found. Using sample questions.', 'info');
@@ -1274,7 +1365,6 @@
                 document.getElementById('streaming-status').innerText = `📚 ${psychoStream.loadedPool.length} in pool`;
             } catch (e) {
                 console.error(e);
-                // Ultimate fallback
                 psychoStream = {
                     fileQueue: [],
                     loadedPool: getSampleQuestions(),
@@ -1292,7 +1382,6 @@
             }
         }
 
-        // ---------- PSYCHO EXAM (loads all at once, then takes 100 random) ----------
         async function startPsychoExam(btn) {
             setButtonLoading(btn, true);
             try {
@@ -1323,7 +1412,6 @@
             } catch (e) { showToast('Error'); } finally { setButtonLoading(btn, false); }
         }
 
-        // ---------- DAILY CHALLENGE ----------
         async function startDailyChallenge(btn) {
             setButtonLoading(btn, true);
             try {
@@ -1353,7 +1441,6 @@
             } catch (e) { showToast('Error'); } finally { setButtonLoading(btn, false); }
         }
 
-        // ---------- COMMON HELPERS ----------
         async function collectSelectedFileIds() {
             let checkboxes = document.querySelectorAll('#chapter-list input[type="checkbox"]:checked:not(:disabled)');
             let selected = Array.from(checkboxes).map(cb => cb.value);
@@ -1394,7 +1481,6 @@
             return a;
         }
 
-        // ---------- REVIEW MODES ----------
         function startReview(mode, btn) {
             let items = mode === 'bookmark' ? bookmarks : flaggedQuestions;
             if (!items.length) { showToast(`No ${mode === 'bookmark' ? 'bookmarked' : 'flagged'} questions`); return; }
@@ -1411,25 +1497,6 @@
             startUnifiedMode('standardPractice', wrongSkipped.map(q => ({ ...q })), chapterName + ' (Wrong & Skipped)');
         }
 
-        // ---------- STATISTICS & EXPANDABLE ----------
-        function displayHomeStats() {
-            let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
-            let html = '<ul class="stat-list">';
-            for (let topic in stats) {
-                let s = stats[topic];
-                let acc = s.total ? ((s.correct / s.total) * 100).toFixed(1) : 0;
-                html += `<li class="stat-item">
-                            <span><strong>${escapeHtml(topic)}</strong>: ${s.correct}/${s.total} (${acc}%) – ${s.time}s</span>
-                            <span class="stat-actions">
-                                <button class="review-wrong-btn" onclick="window.reviewWrongChapter('${escapeHtml(topic).replace(/'/g, "\\'")}')">📘 Review Wrong</button>
-                                <button class="reset-btn" onclick="window.resetStat('${escapeHtml(topic).replace(/'/g, "\\'")}')">Reset</button>
-                            </span>
-                        </li>`;
-            }
-            html += '</ul>';
-            document.getElementById('stats-home').innerHTML = html || '<p>No data yet.</p>';
-        }
-
         window.reviewWrongChapter = function(topic) {
             let wrong = wrongQuestionsByChapter[topic];
             if (!wrong || !wrong.length) { showToast('No wrong answers for this chapter'); return; }
@@ -1440,16 +1507,20 @@
             let stats = JSON.parse(localStorage.getItem('quizStats') || '{}');
             delete stats[topic];
             localStorage.setItem('quizStats', JSON.stringify(stats));
+            // Remove from order too
+            let order = JSON.parse(localStorage.getItem('chapterOrder') || '[]');
+            order = order.filter(name => name !== topic);
+            localStorage.setItem('chapterOrder', JSON.stringify(order));
             displayHomeStats();
         };
 
-        // ---------- DATA MANAGEMENT ----------
         function exportData() {
             const data = {
                 bookmarks,
                 flaggedQuestions,
                 wrongQuestionsByChapter,
-                quizStats: JSON.parse(localStorage.getItem('quizStats') || '{}')
+                quizStats: JSON.parse(localStorage.getItem('quizStats') || '{}'),
+                chapterOrder: JSON.parse(localStorage.getItem('chapterOrder') || '[]')
             };
             downloadJSON(data, 'sathi-backup.json');
         }
@@ -1470,6 +1541,7 @@
                             localStorage.setItem('wrongQuestionsByChapter', JSON.stringify(wrongQuestionsByChapter));
                         }
                         if (d.quizStats) localStorage.setItem('quizStats', JSON.stringify(d.quizStats));
+                        if (d.chapterOrder) localStorage.setItem('chapterOrder', JSON.stringify(d.chapterOrder));
                         showToast('Imported');
                         displayHomeStats();
                     } catch (e) { showToast('Invalid file'); }
@@ -1501,7 +1573,6 @@
             }
         }
 
-        // ---------- ONLINE & LOCAL FILE LOADERS ----------
         async function fetchAndStart(mode, btn) {
             setButtonLoading(btn, true);
             try {
@@ -1534,7 +1605,6 @@
             reader.readAsText(file);
         }
 
-        // ---------- CHAPTER SELECTORS (Online) ----------
         function getChapterName(level, chapNum) {
             return CHAPTER_NAMES_BY_LEVEL[level]?.[chapNum] || `Chapter ${chapNum}`;
         }
@@ -1577,7 +1647,6 @@
             }
         }
 
-        // ---------- CHAPTER LIST (Smart Modes) ----------
         function buildChapterList() {
             const container = document.getElementById('chapter-list');
             container.innerHTML = '';
@@ -1625,7 +1694,6 @@
             document.querySelectorAll('#chapter-list input[type="checkbox"]:not(:disabled)').forEach(cb => cb.checked = false);
         }
 
-        // ---------- THEME, FONT, MENU ----------
         function initTheme() { if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode'); }
         function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode')); }
         function changeFont() { document.body.style.fontFamily = document.getElementById('font-selector').value; localStorage.setItem('selectedFont', document.body.style.fontFamily); }
@@ -1633,7 +1701,6 @@
         function toggleMobileMenu() { document.getElementById('nav-actions').classList.toggle('open'); }
         function goHome() { location.reload(); }
 
-        // ---------- EVENT BINDING ----------
         function bindEvents() {
             document.getElementById('level-select').addEventListener('change', updateChapters);
             document.getElementById('chapter-select').addEventListener('change', updateTopics);
@@ -1679,7 +1746,7 @@
             });
         }
 
-        // ========== PWA SETUP ==========
+        // PWA setup
         (function() {
             const iconUrl = 'https://i.imgur.com/lCc9SUi.png';
             const manifest = {
@@ -1747,7 +1814,6 @@
             }
         })();
 
-        // ---------- INITIALIZATION ----------
         function init() {
             buildChapterList();
             displayHomeStats();
